@@ -1,0 +1,130 @@
+RPi4 directions to make a vagrant like environment for builds
+
+- We can change the name of the hostname in the Desktop -> Preferrences -> RaspberryPi Configuration dialog. Then edit /etc/hosts to change "localhost" to the new name and then reboot.
+
+- pip3 install --user ansible
+- cd /home/pi/.local/bin
+- sudo chmod 775 ansible*
+- cd
+- vi .bashrc to add "export  PATH=$PATH:/home/pi/.local/bin/ansible" at end
+- mkdir connectbox
+- cd connectbox
+- mkdir ImageBuild
+- cd ImageBuild
+- mkdir Images
+- cd Images
+- mkdir NEO
+- mkdir RPi
+- cd
+- cd connectbox
+- git clone https://github.com/ConnectBox/connectbox-pi
+- cd connectbox-pi/ansible
+- cp inventory.example inventory
+- vi inventory
+   - add line "10.0.0.118 wireless_country_code=US" and then exit editor
+- ssh-keygen -t rsa
+- cd
+- cd connectbox
+- cp /home/pi/.ssh/id_rsa.pub .
+- python3 -m pip install click
+- python3 -m pip install pygithub
+- cd ImageBuild
+- git clone https://github.com/ConnectBox/connectbox-tools
+- 
+
+Now we should have our environment set up, so we can proceed similar to vagrant build instructions with some minor path changes to accomodate our setup.
+
+INSTRUCTIONS FOR NEO
+
+- Burn a base image on uSD
+- Put uSD in a target machine (NEO) and power up
+- Find IP and ping to verify target machine is up
+- vi /home/pi/.ssh/known_hosts to remove previous key info
+- ssh root@10.0.0.118
+- Set up ssh passwordless login for user root (original pw=1234, new pw=connectbox)
+- cd 
+- cd connectbox/connectbox-pi/ansible
+- Build the image with:
+   - ansible-playbook -i inventory -e ansible_user=root -e connectbox_version=v20210208 -e deploy_sample_content=False -e do_image_preparation=True site.yml
+
+   - power down and put uSD in USB adapter and plug in to RPi
+   - (don't eject USB from desktop)
+   - lsblk (should see sda/sda1)
+   - umount sda1
+   - cd
+   - cd connectbox/ImageBuild
+   - sudo ./RP_shrink-image.sh /dev/sda Images/NEO/v20210207.img
+   - xz -k Images/NEO/v20210207.img
+
+
+To get around the running of ansible in python(2) and force to python3, it was suggested to set ansible_python_interpreter to "auto" (default is "auto_legacy"), which I THINK is done by adding "-e ansible_python_interpreter=auto". SO the ansible playbook line becomes:
+
+ansible-playbook -i inventory -e ansible_python_interpreter=auto -e ansible_user=root -e deploy_sample_content=False -e do_image_preparation=True -e connectbox_version=v20210208 site.yml
+
+Going to try that after the current build (2/8/21 2:50pm start build) finishes
+
+(Alternately, perhaps we can add a line to ansible.cfg under [defaults] which reads:
+ansible_python_interpreter = auto
+
+Add that line plus the following into ansible.cfg
+ansible_user = root
+deploy_sample_content = False
+do_image_preparation = True
+
+Now try build with following line:
+ansible-playbook -i inventory -e connectbox_version=v20210208 site.yml
+
+Didn't work... for some reason the ansible.cfg did not cause the variables normally on the command line to register (specifically, it tried to run as user "pi")... for the moment, we are going back to the full command line version, as in:
+
+ansible-playbook -i inventory -e ansible_python_interpreter=auto -e ansible_user=root -e deploy_sample_content=False -e do_image_preparation=True -e connectbox_version=v20210208 site.yml
+
+
+Experiences...
+ansible/group_vars/raspbian has ansible_user: pi
+try making it root and see if build can connect at first
+Result... did not change... still trying to connect as pi
+
+Try in inventory:
+10.0.0.118 wireless_country_code=US ansible_user=root
+That works
+
+Tried the ansible_python_interpreter=auto in the config file... didn't work... seems to make the best sense to leave it in the command line... aargh!
+
+Install Etcher...
+From article: https://www.hackster.io/Eat_Apples/balena-etcher-on-raspberry-pi-bf4188
+sudo apt-get update
+sudo apt-get upgrade
+Download:
+  https://drive.google.com/uc?id=1WCRqbBNleKfuBGu6YJHxqcXckGh8sdRu&export=download 
+   (Ends up in the Home/pi/Downloads folder)
+sudo unzip /home/pi/Downloads/Etcher.zip
+   (this creates /home/pi/Etcher)
+cd /home/pi/Etcher/Balena\ Etcher/
+sudo apt-get install libgconfmm-2.6
+sudo ./balena-etcher-electron
+  (Now Etcher is running on desktop)
+--- Create a shortcut for etcher ---
+sudo vi /usr/share/applications/etcher.desktop
+  [Desktop Entry]
+  Name=Etcher
+  Comment=Disk Imaging Utility
+  GenericName=Balena Etcher
+  Exec=/home/pi/Etcher/Balena\ Etcher/balena-etcher-electron
+  Icon=/home/pi/Pictures/Etcher-icon.png
+  Terminal=false
+  StartupNotify=true
+  Type=Application
+  Categories=Utility;GTK;
+Download the icon (bottom of the referenced article) and save to /home/pi/Pictures
+Rename icon to Etcher-icon.png
+Reboot...
+
+
+
+
+
+
+
+   
+ 
+
