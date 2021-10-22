@@ -1,0 +1,8 @@
+GitHub Desktop Notes
+
+From slack... 10/21/21
+
+I did have a nice talk with Derek on how to test branches… basically, once you get a local copy of connectbox-pi (from “git clone http://github.com/ConnectBox/connectbox-pi”) you can then do a command line “git switch <branchName>” where <branchName> is the name of the branch that you want to use for the current build. (This changes the contents of your copy of connectbox-pi from the contents in the master to the contents in the branch <branchName>). If you want to build with, like, a different branch of the connectbox-hat-service repo, find the place in the ansible where it is cloned (ex: ansible/roles/hat-service/tasks/main.yml, line 72 which reads:
+“name: git+https://github.com/ConnectBox/NEO-BatteryLevelShutdown.git”) and change it by adding “@<branchName>” at the end (so like:
+ “name: git+https://github.com/ConnectBox/NEO-BatteryLevelShutdown.git@myBranch”)
+Although my workflow grabs a copy of the connectbox-pi repo to a local directory (as described above), I get the sense that Derek uses a workflow that uses the copy of connectbox-pi repo that is maintained by the github desktop. And that makes some sense, because edits you try in a build are then already in your area maintained by github desktop, so a publish would not require copying over changes from a build area into the github desktop area.
