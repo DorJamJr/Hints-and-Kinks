@@ -1,0 +1,14 @@
+Build From Local Repo
+
+Using GitHub local repo for a build
+
+GitHub Desktop allows us to easily see branches and to change our local repo to such a branch. If we cd into the local repo (like Documents/GitHub/connectbox-pi) and start our build process from there, we should be able to create a build using a branch of our repo.
+
+So opening GitHub Desktop, choose repo connectbox-pi and then choose branch brandtxt-generated. (Note that this select is sticky... ie, looking at a different repo with GitHub Desktop leaves the connectbox-pi repo still in the selected branch... and thus, the text of code in the GitHub/conectbox-pi folders containing that which is associated with the selected branch.) (verified)
+
+To build...
+  - cd Documents/GitHub/connectbox-pi
+  - chmod 777 ../connectbox-tools/deployment/make_cb.py
+  -   (it was 644)
+  - ../connectbox-tools/deployment/make_cb.py
+  - (we get a number of installs to the build environment (I think) at the first run... getting messy... aborting!)
