@@ -1,4 +1,5 @@
 Build From Local Repo
+------------------------------
 
 Using GitHub local repo for a build
 
@@ -12,3 +13,19 @@ To build...
   -   (it was 644)
   - connectbox-tools/deployment/make_cb.py
  
+
+ Build from merge of master into branch
+ ---------------------------------------
+
+ It may be desireable to test a build which would have resulted from merging a branch into master. We can do that (without actually doing the merge) by first creating a new branch from the previous branch and then merging master into the new branch, then building from that branch. 
+
+ Example...
+ In GitHub Desktop, select repo connectbox-pi, branch brandtxt_generated
+ Create a new branch btg_w_master from brandtxt_generated
+ Change to branch btg_w_master
+ In the branch pulldown, select "Choose branch to merge to btg_w_master"
+ In the next dialog, select master
+ Click the button to merge and resolve conflicts
+ Click the button to finish the merge.
+
+ Now proceed to build (as above) using the branch btg_w_master
