@@ -7,8 +7,8 @@ GitHub Desktop allows us to easily see branches and to change our local repo to 
 So opening GitHub Desktop, choose repo connectbox-pi and then choose branch brandtxt-generated. (Note that this select is sticky... ie, looking at a different repo with GitHub Desktop leaves the connectbox-pi repo still in the selected branch... and thus, the text of code in the GitHub/conectbox-pi folders containing that which is associated with the selected branch.) (verified)
 
 To build...
-  - cd Documents/GitHub/connectbox-pi
-  - chmod 777 ../connectbox-tools/deployment/make_cb.py
+  - cd Documents/GitHub
+  - chmod 777 connectbox-tools/deployment/make_cb.py
   -   (it was 644)
-  - ../connectbox-tools/deployment/make_cb.py
-  - (we get a number of installs to the build environment (I think) at the first run... getting messy... aborting!)
+  - connectbox-tools/deployment/make_cb.py
+ 
