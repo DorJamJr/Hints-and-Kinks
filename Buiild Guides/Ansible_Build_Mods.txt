@@ -1,0 +1,7 @@
+Ansible_Build_Mods.txt
+
+Build CM4_040222
+-e connectbox_default_hostname=thewell -e wireless_country_code=US -e build_moodle=true -e developer_mode=true -e alternative_lcd_logo=https://bolt.thewellcloud.cloud/files/assets/lcdwelllogo.png
+
+Kirk Suggests (for theWell build):
+-e connectbox_default_hostname=thewell -e wireless_country_code=US -e build_moodle=true -e developer_mode=true -e lcd_logo=well_logo.png
