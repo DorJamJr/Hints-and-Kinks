@@ -1,0 +1,38 @@
+Some useful command line commands:
+
+systemctl stop neo-battery-shutdown
+systemctl start neo-battery shutdown
+
+journalctl --follow --unit=neo-battery-shutdown
+
+ifconfig
+iwconfig
+lsusb
+
+systemctl list-units
+
+systemctl start hostapd
+systemctl stop hostapd
+
+systemctl start dnsmasq
+systemctl stop dnsmasq
+
+systemctl start ssh
+
+cd /etc/networks
+   vi interfaces
+
+lshw -c networks		// lists hardware interfaces
+
+ifup wlan1
+ifdown wlan0
+ifconfig 
+
+ifconfig wlan1 up
+
+vi /etc/network/interface
+
+cat /var/log/syslog
+
+
+
