@@ -9,7 +9,7 @@ ifconfig
 iwconfig
 lsusb
 
-systemctl list-units
+systemctl list-units       // shows failed processes
 
 systemctl start hostapd
 systemctl stop hostapd
