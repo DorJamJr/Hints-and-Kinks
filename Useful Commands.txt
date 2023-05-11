@@ -34,5 +34,11 @@ vi /etc/network/interface
 
 cat /var/log/syslog
 
+systemctl start dhcpcd
+systemctl status dhcpcd.service
+journalctl -xe
+
+
+
 
 
