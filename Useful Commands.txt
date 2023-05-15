@@ -38,6 +38,22 @@ systemctl start dhcpcd
 systemctl status dhcpcd.service
 journalctl -xe
 
+ps -ef         // list processes
+kill <PID>     // kill process number <PID>
+
+systemctl stop PxUSBm
+
+cat /etc/wpa_supplicant/wpa_supplicant.conf
+cat /etc/network/interfaces
+
+connectboxmanage
+pm2 logs                   // like journalctl for pm2
+
+(To get private Safari window, go to file - open private window)
+<right click in Safari window and choose Inspector to see command flow>
+
+
+
 
 
 
