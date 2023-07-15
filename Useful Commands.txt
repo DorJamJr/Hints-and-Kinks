@@ -50,9 +50,20 @@ connectboxmanage
 pm2 logs                   // like journalctl for pm2
 
 (To get private Safari window, go to file - open private window)
+(To use Safari development tools, open Safari -> Preferences -> Advanced
+  and check "Show Develop menu in menu bar")
 <right click in Safari window and choose Inspector to see command flow>
 
+
 tail -f /var/logs/syslogs
+
+
+lsmod          // lists the installed (and used) drivers
+
+lshw -C Network     // lists associations between wlan and hardward
+
+grep -rnw '/path/to/somewhere/' -e 'pattern'
+
 
 
 

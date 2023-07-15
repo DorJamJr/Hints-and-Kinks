@@ -1,0 +1,12 @@
+Debug for RPi_051023
+
+First problem is that the PxUSBm.py doesn't create /usr/local/connectbox/expand_progress.txt (caused by failure of fdisk command sequence)
+	- #443 - the form 
+	     child.expect('Partition number (1,2*') 
+	  throws an error because of the unmatched parenthesis (even though it is in a string quote)
+	- Changing to form
+	      child.expect('Partition number')
+	  resolves the problem
+	- This only happens on a RPi version (because NEO just has one partition (?))  
+	  
+Next problem - the expand_progress.txt file contains "running"
