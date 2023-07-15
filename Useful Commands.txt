@@ -52,6 +52,7 @@ pm2 logs                   // like journalctl for pm2
 (To get private Safari window, go to file - open private window)
 <right click in Safari window and choose Inspector to see command flow>
 
+tail -f /var/logs/syslogs
 
 
 
