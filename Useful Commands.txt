@@ -62,8 +62,16 @@ lsmod          // lists the installed (and used) drivers
 
 grep -rnw '/path/to/somewhere/' -e 'pattern'
 
-
-
+raspi-config
+  5 - localization options
+    L3 - keyboard
+      Generic 105-key PC (intl.)
+        Other - English (US)
+          <at the top> English (US)
+            The default for the keyboard layout
+              No compose key
+  <Finish>
+  
 
 
 
