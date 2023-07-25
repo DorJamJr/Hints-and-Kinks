@@ -73,6 +73,6 @@ raspi-config
   <Finish>
   
 
-
+/proc/cpuinfo       // tells the processor info
 
 
