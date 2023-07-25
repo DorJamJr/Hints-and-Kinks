@@ -1,0 +1,35 @@
+.[?2004l
+[  383.926183] android_work: did not send uevent (0 0           (null))
+[  383.981951] ttyFIQ ttyFIQ0: tty_port_close_start: tty->count = 1 port count = 3
+[  384.079401] dwhdmi-rockchip fe0a0000.hdmi: Rate 0 missing; compute N dynamically
+[  385.468824] systemd-shutdown[1]: Syncing filesystems and block devices.
+[  386.164915] systemd-shutdown[1]: Sending SIGTERM to remaining processes...
+[  386.175844] systemd-journald[201]: Received SIGTERM from PID 1 (systemd-shutdow).
+[  386.217703] systemd-shutdown[1]: Sending SIGKILL to remaining processes...
+[  386.234066] systemd-shutdown[1]: Unmounting file systems.
+[  386.238437] [632]: Remounting '/' read-only in with options '(null)'.
+[  386.261048] EXT4-fs (mmcblk1p2): re-mounted. Opts: (null)
+[  386.271964] systemd-shutdown[1]: All filesystems unmounted.
+[  386.272023] systemd-shutdown[1]: Deactivating swaps.
+[  386.272221] systemd-shutdown[1]: All swaps deactivated.
+[  386.272254] systemd-shutdown[1]: Detaching loop devices.
+[  386.275991] systemd-shutdown[1]: All loop devices detached.
+[  386.276039] systemd-shutdown[1]: Stopping MD devices.
+[  386.276353] systemd-shutdown[1]: All MD devices stopped.
+[  386.276387] systemd-shutdown[1]: Detaching DM devices.
+[  386.276644] systemd-shutdown[1]: All DM devices detached.
+[  386.276676] systemd-shutdown[1]: All filesystems, swaps, loop devices, MD devices and DM devices detached.
+[  386.297107] systemd-shutdown[1]: Syncing filesystems and block devices.
+[  386.298587] systemd-shutdown[1]: Powering off.
+[  386.298672] cpu cpu0: min=816000, max=816000
+[  386.302131] rk808 0-0020: reboot: not restore POWER_EN
+[  386.327350] mpp_rkvenc fdf40000.rkvenc: shutdown device
+[  386.327839] mpp_rkvenc fdf40000.rkvenc: shutdown success
+[  386.341053] fan53555-regulator 0-001c: fan53555..... reset
+[  386.342564] fan53555-regulator 0-001c: reset: force fan53555_reset ok!
+[  386.343681] mpp_rkvdec2 fdf80200.rkvdec: shutdown device
+[  386.344182] mpp_jpgdec fded0000.jpegd: shutdown device
+[  386.344663] mpp-iep2 fdef0000.iep: shutdown device
+[  386.345110] mpp_vepu2 fdee0000.vepu: shutdown device
+[  386.345577] mpp_vdpu2 fdea0400.vdpu: shutdown device
+[  386.351184] reboot: Power down

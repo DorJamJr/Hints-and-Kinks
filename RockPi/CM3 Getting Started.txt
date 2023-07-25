@@ -1,0 +1,102 @@
+
+The CM3 is the RockPi version of RPi CM4. Some helpful articles:
+- https://dphacks.com/2023/05/30/radxa-rock-cm3-review-all-you-need-to-know/
+- https://wiki.radxa.com/Rock3/install/rockchip-flash-tools
+
+The install flash tools article wants to use homebrew on the Mac (which I don't like), but an alternate seems to be install on a linux system... I'm thinking on my RPi4
+
+The install flash tools seem to allow an image to be flashed to onboard memory (as opposed to booting via uSD). That may not be useful for us.
+
+- https://forum.radxa.com/t/any-rock-pi-cm3-os-with-kernel-version-5-xx/13087/5
+From this discussion, there are two takeaways
+  1. The Rock 3 is NOT the Rock CM3
+  2. While there is armbian support for the Rock 3, there are no arbian images for the Rock CM3 (as of December 2022).
+  Bummer!
+
+- https://github.com/radxa-build/radxa-cm3-io/releases/tag/20221101-0118
+This repo has images for CM3 (debian). I've downloaded:
+    radxa-cm3-io-debian-bullseye-xfce4-arm64-20221101-0302-gpt.img.xz
+This code actually boots (radxa Rock 3 Compute Module IO Board) and initial screens are similar to the CM4 boot.... but it is a desktop code version of code (not CLI)
+Boot: login: rock  pw: rock
+sudo passwd root 		// connectbox
+logout and back in as root
+ifconfig 10.0.0.36
+
+does not boot on out CM4 HAT... 
+
+Net : https://jamesachambers.com/radxa-rock-3-compute-module-review/
+Suggested:
+cd /boot/dtbs/$(uname -r)/rockchip/
+sudo mv rk3566-radxa-cm3-io.dtb rk3566-radxa-cm3-io.dtb.bak
+sudo cp rk3566-radxa-cm3-rpi-cm4-io.dtb rk3566-radxa-cm3-io.dtb
+
+This did not make it work on our HAT, and broke it on the radxa IO board... reflash the image...
+
+On the radxa IO board (where it will boot) if I leave the uSD chip out, then we don't get flashing LEDs on the CM3 board... so I'm guessing if we got the uSD with a proper image (boot.txt ?) we would be able to boot.... ie, I think the issue is not hardware... it is software...
+
+BTW... James Chambers (see above link) decided it wasn't worth it and put the CM3 in his "drawer of shame" saying it was a "terrible offering!  Worse than the Pine64 SOQuartz"... Not very encouraging!!
+
+Review of Pine64 SOQuartz:
+https://jamesachambers.com/pine64-soquartz-cm4-alternative-review/
+
+Review of BigTreeTech CB1 (uses the H616 processor)
+https://jamesachambers.com/bigtreetech-cb1-cm4-alternative-w-pi4b-adapter-review/
+
+
+072323
+Added connections to TxD3 (CM4 pin 54) and RxD3 (CM4 pin 34) to CM4 HAT 1.8.4 to attempt serial communications during boot
+
+Put uSD with Rock-Pi-CM3-debian image into my RPi4 development machine
+lsblk shows /dev/sdb1 (unmounted) and /dev/sdb2 (mounted as rootfs)
+sudo mkdir /mnt/rock-boot
+sudo mount -t auto -v /dev/sdb1 /mnt/rock-boot
+cd /mnt/rock-boot
+ls  (shows config.txt... YEAH)
+(when done... unmount the partition:  sudo umount /dev/sdb1 -l)
+
+Before making any changes to config.txt, try serial port on uart2 on radxa dev board (default)
+The "screen" utility of Mac didn't work with the serial speed required... 1500000... 
+From: https://wiki.radxa.com/Rockpi4/dev/serial-console
+  they suggest a program CoolTerm... downloaded from developer website: https://freeware.the-meiers.org
+
+I set it up per the suggestions on the radxa site and we got readable activity on the boot...
+
+(Activity captured as 072323-1700-Serial on radxa board.txt)
+
+
+No changes to uSD (sp. config.txt) try serial on CM4 HAT with CM3 board
+As expected... nothing...
+Mount /dev/sdb1 and edit config.txt
+  change "... uart2m0" to "...uart4m0"
+Try boot in CM4 HAT
+Nothing... looks like we need to try UART2... pins 55 (TxD) and 51(RxD) on CM4 connector...
+Try again...
+Still nothing on the Serial...
+Try cut the GPIO IRQ clad to remove influence of IRQ circuit...
+
+
+Spent a bit more time on the CM3 (able now to use serial terminal to view boot activity on the radxa carrier board… still no joy on our HAT)…
+Digging into “compatible carrier boards” as published by radxa, (Ref:  https://wiki.radxa.com/Rock3/CM/CM3) I found this curious statement…
+ “The following carrier boards are tested and compatible with the Radxa CM3 with on-board eMMC.
+Currently no eMMC revision cannot boot from microSD on Raspberry Pi CM4 IO and compatibles. We will fix this in a later hardware revision.”
+Taken together I THINK they are saying that while many RPi CM4 carrier boards are compatible with “eMMC equipped [CM3] boards”, NONE of the NON-eMMC equipped radxa CM3 boards will boot on third party carrier boards (ie, like our HAT) using only uSD.
+
+072523
+FINALLY!!
+Last night (early) I found that the SDMMC_PWRENA (pin 75, SD_PWR_ON) logic of the CM3 board is reversed from the logic of the CM4 board. (CM4 is HIGH to turn on power to the SD card, CM3 logic is LOW to turn on). The CM3 IO board handles this with an inverter P-Ch FET to control power to their uSD socket (and also an alternate configuration to leave power on all the time). I made a similar change to my 1.7.2 HAT (adding a P-Ch FET to invert the signal to our uSD power switch) and tried booting... no joy... still quiet...
+
+Later last night I was looking over the schematic for the CM3 IO board and in particular the connections related to the uSD. I found that the CM3 IO board had wired the uSD Present switch (terminals at the back of the uSD socket) to the CM3 connector pin 76. Checking the docs, I find that the CM4 spec (RPi)
+has this pin labled "Reserved" and therefore, on our HATs is not connected. But the CM3 board, although still labeling the pin as "Reserved" (schematic p.21), wires this pin (wire labled "SDMMC0_DET_L"), directly into the RK35 (p. 6) pin AF37. 
+
+This morning I shorted pin 76 of the CM4 connector on my 1.7.2 HAT to ground (pin 74) and tried a boot... success! We got activity on both the serial and HDMI monitors. Tx Rx both work. PTL!
+
+So there are two hardware issues in using the CM3 board on our HATs...
+1. The inverted signal on the uSD power enable line (pin 75)
+2. The unexpected use of a Reserved pin (pin 76) for sensing uSD insertion... (pulled low when inserted)
+If those two issues are accounted for in our hardware, the board will boot.
+
+Note: We still have a LONG way to go to get a useful image on the CM3 (RK3566).
+
+
+
+
