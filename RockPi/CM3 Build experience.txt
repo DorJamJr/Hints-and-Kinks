@@ -1,0 +1,51 @@
+CM3 Build experience
+
+Starting with image: radxa-cm3-io-debian-bullseye-xfce4-arm64-20230201-1123-gpt.img.xz
+Hardware: CM3 on modified CM4 HAT (ver 1.7.2) (pin 76 to gnd via 20K; uSD power control inverted)
+Ansible code of 072023
+
+Note: ansible packages build order:
+ - bootstrap, hat-service, dns-dhcp, network-interfaces, wifi-ap, mikegleasonjr, enhanced-content, nginx, captive-portal, webserver-content, usb-content, sample-content, rpi-permissions, wlan-set, remove-lz4
+
+Initial findings on ansible script:
+  - Codename: bullseye
+  - Family: debian
+  - ansible_kernel: 4.19.193-67-rockchip-g450948183988
+  - machine type: Radxa CM3 IO
+  - CM4 present=false; MTypeRadxa CM3 IO\\x00; NEO_present=false; OZ2_present=false; PIi_present=false
+  - working on base of: ['Radxa CM3 IO\\x00']|first
+
+Errors:
+- [bootstrap : apt update before kernel downloads]   (tasks/main.yml #246)
+  - Code tried to downgrade some modules and failed
+  - suggested add "allow_downgrade: yes"
+  - added and restarted build... got through but a later restart of the build (for another failure) gave an error "allow_downgrade is unrecognized option"
+  - removed the "allow_downgrade:yes" line and restarted... this time it ran through 
+  - perhaps the code downgraded the apt module to where the option was invalid??
+
+- [mikegleasonjr.firewall : Load v4 rules]      (tasks/rules.yml #7)
+  - several invalid parameter errors when running script /etc/iptables.v4.generated
+  - determined iptables commands all crashed for "invalid parameter"
+  - net search found advice:  
+        update-alternatives --set iptables /usr/sbin/iptables-legacy
+  - ran the command by hand and restarted
+  - fixed
+
+-[enhanced-content : Run npm to install dependencies for connectbox-manage] (tasks/main.yml  #123)
+  - "cmd": "/usr/bin/npm install", "msg": "npm WARN EBADENGINE Unsupported engine
+  - error indicates we are at ver 3.4.0 but need to be at ver 7
+  - tried manual /usr/bin/npm install" and got "up to date"
+  - tried "npm" and found "npm@7.5.2"
+  - looks like it installed 7.5.2 (??)
+  - why then the error?
+  - restart build
+
+- [enhanced-content : Cause phonehome.py to execute every 10 minutes via cron IF not a Moodle box  (We have different process for Moodle)] (tasks/main.yml  #160) 
+  - failed to find crontab
+  - need to install cron:  sudo apt-get update; sudo apt-get install cron
+  - manually installed and restarted the build
+
+  
+
+
+

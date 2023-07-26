@@ -97,6 +97,12 @@ If those two issues are accounted for in our hardware, the board will boot.
 
 Note: We still have a LONG way to go to get a useful image on the CM3 (RK3566).
 
+072523
+Rock CM3 debian help:  https://wiki.radxa.com/Rock3/Debian
+Radxa Debian Releases:  https://github.com/radxa/debos-radxa/releases
+Radxa most recent (subset of above): https://github.com/radxa/debos-radxa/releases/tag/20230201-0944
+Image of interest to us: radxa-cm3-io-debian-bullseye-xfce4-arm64-20230201-1123-gpt.img.xz
+
 
 
 
