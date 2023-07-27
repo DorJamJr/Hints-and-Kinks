@@ -75,4 +75,4 @@ raspi-config
 
 /proc/cpuinfo       // tells the processor info
 
-
+systemctl enable ssh      // start service at boot
