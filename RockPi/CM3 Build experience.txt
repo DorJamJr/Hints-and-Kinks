@@ -45,6 +45,32 @@ Errors:
   - need to install cron:  sudo apt-get update; sudo apt-get install cron
   - manually installed and restarted the build
 
+
+
+First Boot...
+Power on... not a lot of joy... did boot... the desktop wouldn't recognized keystrokes and the serial also didn't respond...
+
+Powered down... pulled chip... mounted /boot on my RPi4 desktop and did a "touch ssh"... put chip back in CM3 set and rebooted... 
+
+Keyboard now recognized... could log on to desktop... no icons on desktop but mouse right click let me start a terminal... (previously tried ssh root@10.0.0.39 and got ssh refusal)... on the CM3 desktop (terminal) I did a "sudo systemctl start ssh" and got that to work... back on Mac, I was able to now do the ssh root@10.0.0.39...
+
+-Checked /usr/local/connectbox (it does exist) for the progress file of PxUSBm... nada... so I'm guessing the PxUSBm service didn't start... 
+
+- ran "systemctl status PxUSBm" and it is showing failure (with restarts)... try stopping service (ok) 
+- checking the neo-battery-shutdown... "systemctl start neo-battery-shutdown" then "journalctl --follow --unit=neo-battery-shutdown" showing that the neo-battery-shutdown code is failing when trying to import RPi.GPIO (actually that isn't much of a surprise)... the error is "RuntimeError: It is not NanoPi based board"...
+- Tried a manual run of PxUSBm.py ("python3 PxUSBm.py" and it fails with error:
+File "/usr/local/connectbox/bin/PxUSBm.py", line 364, in do_fdisk
+  child = pexpect.spawn('fdisk /dev/mmcblk0', timeout = 10
+
+
+PxUSBm.py #1125 - define new module for CM3 different from CM4
+
+Need to do "apt install fdisk"
+
+
+
+
+
   
 
 

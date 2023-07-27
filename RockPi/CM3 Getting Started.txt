@@ -86,7 +86,7 @@ FINALLY!!
 Last night (early) I found that the SDMMC_PWRENA (pin 75, SD_PWR_ON) logic of the CM3 board is reversed from the logic of the CM4 board. (CM4 is HIGH to turn on power to the SD card, CM3 logic is LOW to turn on). The CM3 IO board handles this with an inverter P-Ch FET to control power to their uSD socket (and also an alternate configuration to leave power on all the time). I made a similar change to my 1.7.2 HAT (adding a P-Ch FET to invert the signal to our uSD power switch) and tried booting... no joy... still quiet...
 
 Later last night I was looking over the schematic for the CM3 IO board and in particular the connections related to the uSD. I found that the CM3 IO board had wired the uSD Present switch (terminals at the back of the uSD socket) to the CM3 connector pin 76. Checking the docs, I find that the CM4 spec (RPi)
-has this pin labled "Reserved" and therefore, on our HATs is not connected. But the CM3 board, although still labeling the pin as "Reserved" (schematic p.21), wires this pin (wire labled "SDMMC0_DET_L"), directly into the RK35 (p. 6) pin AF37. 
+has this pin labled "Reserved" and therefore, on our HATs is not connected. But the CM3 board, although still labeling the pin as "Reserved" (schematic p.21), wires this pin (wire labled "SDMMC0_DET_L"), directly into the RK3566 (p. 6) pin AF37. 
 
 This morning I shorted pin 76 of the CM4 connector on my 1.7.2 HAT to ground (pin 74) and tried a boot... success! We got activity on both the serial and HDMI monitors. Tx Rx both work. PTL!
 
