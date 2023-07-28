@@ -1,0 +1,37 @@
+RM3 (RockPi CM3) build - 2nd pass - 072723
+
+Failed at "[bootstrap : apt update before kernel downloads]"
+(DOWNGRADED:", "  dvb-tools ir-keytable libdvbv5-0 libdvbv5-doc libv4l-0 libv4l-dev", "  libv4l2rds0 libv4lconvert0 openbox qv4l2 v4l-utils")
+
+  Same as before... checked and the apt package is at ver 2.2.4 (ARM64)
+  will add the allow downgrade... and then check later for apt version
+
+  Note: "ansible --version" shows [core 2.12.4]
+
+  Try running again without changing ansible... perhaps the fix is "ignore_error"
+    NOPE... still fails... like it determined the rigtht thing was to downgrade, but
+    without the directive it did not finalize the changes...
+
+
+We had a communication loss at:
+   [enhanced-content : Install cron package required by phonehome.python]
+Probably not coincidence...
+
+The target is still running... ip still 10.0.0.59
+Do a restart of the build and see what happens...
+(BTW... apt is still version 2.2.4)
+
+We get the fail again at "[bootstrap : apt update before kernel downloads]" for unknown option!!
+
+And a fail at the cron install...
+Perhaps a pre-build load of cron? (and pull the install step)
+The cron install completed with:
+- name: Install cron package required by phonehome.python
+  apt:
+    name: cron
+    state: present 
+#  become: true  
+(note the commented become: true... which may have made it work... but I also changed the form of the ansible from "command: apt install cron" so that may have been the fix... ??)
+
+Build went to completion except for the "ignore error" problems and the cron problem... We will see how the image works tomorrow...
+

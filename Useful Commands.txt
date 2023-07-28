@@ -38,6 +38,13 @@ systemctl start dhcpcd
 systemctl status dhcpcd.service
 journalctl -xe
 
+"Hostapd service is masked":
+systemctl unmask hostapd
+systemctl enable hostapd
+systemctl start hostapd
+
+
+
 ps -ef         // list processes
 kill <PID>     // kill process number <PID>
 

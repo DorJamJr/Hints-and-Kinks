@@ -66,6 +66,8 @@ File "/usr/local/connectbox/bin/PxUSBm.py", line 364, in do_fdisk
 PxUSBm.py #1125 - define new module for CM3 different from CM4
 
 Need to do "apt install fdisk"
+Need to re-install crda  ("apt-get install crda")
+
 
 
 
