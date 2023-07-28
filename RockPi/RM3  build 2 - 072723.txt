@@ -35,3 +35,30 @@ The cron install completed with:
 
 Build went to completion except for the "ignore error" problems and the cron problem... We will see how the image works tomorrow...
 
+
+Built RockPi CM3 image 072723 (RM3_20230727.img)
+
+This is the second build attempt. The first was, considering all, fairly successful. (See CM3 Build experience.txt)
+
+For this build, the lessons learned from the build itself and the debug after power on have been incorporated into the ansible build code. Hopefully they will resolve those initial issues and open the door to solving others.
+
+072823
+Boot of RM3_20230727.img
+3:32 from power on to login
+2 reboots - /usr/local/connectbox/expand_progress = rewrite_netfiles_done
+ifconfig showing eth0 up 10.0.0.49; wlan0 up 10.129.0.1 (flags=4163) (8812 id);
+iwconfig wlan0 Mode:Master, ESSID:"Connectbox - Free Media"
+
+iphone sees AP, connect, redirect, admin login all working
+/dev/mmcblk1p2 showing 60398716 (1K) blocks, 7% used
+
+journalctl --follow --unit=neo-battery-shutdown
+  showing failed at import of RPi.GPIO ... "This module can only be run on a Raspberry Pi!"
+
+systemctl list-units showing 
+  ifup@wlan1 service                failed 
+  neo-battery-shutdown.service      failed
+  rockchip-adbd.service             failed
+all others "loaded active ..." (either running or exited)
+
+

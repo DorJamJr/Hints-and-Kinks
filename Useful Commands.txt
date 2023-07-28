@@ -83,3 +83,10 @@ raspi-config
 /proc/cpuinfo       // tells the processor info
 
 systemctl enable ssh      // start service at boot
+
+Make a virtual env:
+python -m venv /jim/jim_venv
+source /jim/jim_venv/bin/activate         // start the env
+deactivate                                // leave the environment
+
+

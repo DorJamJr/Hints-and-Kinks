@@ -69,6 +69,33 @@ Need to do "apt install fdisk"
 Need to re-install crda  ("apt-get install crda")
 
 
+Need to install "apt install crda"
+
+
+072723
+Having trouble with eth0 getting out to net... (ping 8.8.8.8 not reachable) turned on wlan1 to home network (using admin tools via iPhone)... now we can reach 8.8.8.8
+
+create /root/jim/jim_venv and activate
+cd /root/jim/jim_venv
+tried install of RPi.GPIO but that fails due to missing tools
+
+change to battery venv
+cd /usr/local/connectbox/battery_tool_venv
+source bin/activate
+
+then try to remove the existing RPi.GPIO (it is a NEO version and so of no use)
+apt-get remove RPi.GPIO
+(didn't work) rename RPi* to xRPi* instead
+cd /usr/local/connectbox/battery_tool_venv
+bin/pip3 install RPi.GPIO==0.7.0                // missing gcc-aarch64-linux-gnu
+apt-get install gcc-aarch64-linux-gnu           // more errors
+
+
+Perhaps now would be a good time to wrap all we know about build into ansible and do a fresh build...
+- 
+
+
+
 
 
 

@@ -1,0 +1,138 @@
+ usb8: SerialNumber: xhci-hcd.5.auto
+[    3.755453] hub 8-0:1.0: USB hub found
+[    3.760225] hub 8-0:1.0: 1 port detected
+[    3.765765] usb usb7: We don't know the algorithms for LPM for this host, disabling LPM.
+[    3.770697] usb usb7: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 4.19
+[    3.775498] usb usb7: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    3.780209] usb usb7: Product: xHCI Host Controller
+[    3.784828] usb usb7: Manufacturer: Linux 4.19.193-67-rockchip-g450948183988 xhci-hcd
+[    3.789482] usb usb7: SerialNumber: xhci-hcd.4.auto
+[    3.794516] hub 7-0:1.0: USB hub found
+[    3.799110] hub 7-0:1.0: 1 port detected
+[    4.064254] EXT4-fs (mmcblk1p2): mounted filesystem with ordered data mode. Opts: (null)
+[    5.558596] systemd[1]: System time before build time, advancing clock.
+[    5.811959] NET: Registered protocol family 10
+[    5.818730] Segment Routing with IPv6
+[    5.885962] cgroup: cgroup2: unknown option "memory_recursiveprot"
+[    5.932124] systemd[1]: systemd 247.3-7+deb11u2 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2 -IDN +PCRE2 default-hierarchy=unified)
+[    5.953762] systemd[1]: Detected architecture arm64.
+[    6.049679] systemd[1]: Set hostname to <Connectbox>.
+[    7.605024] systemd[1]: Configuration file /etc/systemd/system/PxUSBm.service is marked world-writable. Please remove world writability permission bits. Proceeding anyway.
+[    7.619248] systemd[1]: Configuration file /etc/systemd/system/PxUSBm.service is marked world-inaccessible. This has no effect as configuration data is accessible via APIs without restrictions. Proceeding anyway.
+[    7.657929] systemd[1]: Queued start job for default target Graphical Interface.
+[    7.669147] systemd[1]: system-getty.slice: unit configures an IP firewall, but the local system does not support BPF/cgroup firewalling.
+[    7.676907] systemd[1]: (This warning is only shown for the first unit using IP firewalling.)
+[    7.686543] systemd[1]: Created slice system-getty.slice.
+[    7.704709] systemd[1]: Created slice system-modprobe.slice.
+[    7.720299] systemd[1]: Created slice User and Session Slice.
+[    7.734020] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[    7.747668] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[    7.762216] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[    7.776160] systemd[1]: Reached target Local Encrypted Volumes.
+[    7.790016] systemd[1]: Reached target Paths.
+[    7.803671] systemd[1]: Reached target Remote File Systems.
+[    7.817432] systemd[1]: Reached target Slices.
+[    7.831905] systemd[1]: Listening on fsck to fsckd communication Socket.
+[    7.846388] systemd[1]: Listening on initctl Compatibility Named Pipe.
+[    7.887378] systemd[1]: Condition check resulted in Journal Audit Socket being skipped.
+[    7.893457] systemd[1]: Listening on Journal Socket (/dev/log).
+[    7.910637] systemd[1]: Listening on Journal Socket.
+[    7.929180] systemd[1]: Listening on udev Control Socket.
+[    7.945460] systemd[1]: Listening on udev Kernel Socket.
+[    7.964087] systemd[1]: Condition check resulted in Huge Pages File System being skipped.
+[    7.972307] systemd[1]: Mounting POSIX Message Queue File System...
+[    7.990768] systemd[1]: Mounting Kernel Debug File System...
+[    8.009596] systemd[1]: Mounting Kernel Trace File System...
+[    8.034859] systemd[1]: Starting Restore / save the current clock...
+[    8.053271] systemd[1]: Starting Set the console keyboard layout...
+[    8.072129] systemd[1]: Starting Create list of static device nodes for the current kernel...
+[    8.091349] systemd[1]: Starting Load Kernel Module configfs...
+[    8.110966] systemd[1]: Starting Load Kernel Module drm...
+[    8.130974] systemd[1]: Starting Load Kernel Module fuse...
+[    8.155181] systemd[1]: Condition check resulted in Set Up Additional Binary Formats being skipped.
+[    8.161208] systemd[1]: Condition check resulted in File System Check on Root Device being skipped.
+[    8.165224] systemd[1]: Starting Journal Service...
+[    8.177794] fuse init (API version 7.27)
+[    8.200781] systemd[1]: Starting Load Kernel Modules...
+[    8.218457] systemd[1]: Starting Remount Root and Kernel File Systems...
+[    8.236379] systemd[1]: Starting Coldplug All udev Devices...
+[    8.257280] systemd[1]: Mounted POSIX Message Queue File System.
+[    8.268955] EXT4-fs (mmcblk1p2): re-mounted. Opts: (null)
+[    8.278706] systemd[1]: Mounted Kernel Debug File System.
+[    8.290250] systemd[1]: Mounted Kernel Trace File System.
+[    8.305257] systemd[1]: Finished Restore / save the current clock.
+[    8.326665] systemd[1]: Finished Set the console keyboard layout.
+[    8.341453] systemd[1]: Finished Create list of static device nodes for the current kernel.
+[    8.356982] systemd[1]: modprobe@configfs.service: Succeeded.
+[    8.363140] systemd[1]: Finished Load Kernel Module configfs.
+[    8.377589] systemd[1]: modprobe@drm.service: Succeeded.
+[    8.383173] systemd[1]: Finished Load Kernel Module drm.
+[    8.394856] systemd[1]: modprobe@fuse.service: Succeeded.
+[    8.400522] systemd[1]: Finished Load Kernel Module fuse.
+[    8.409180] g_serial gadget: Gadget Serial v2.4
+[    8.409186] g_serial gadget: g_serial ready
+[    8.410401] dwc3 fcc00000.dwc3: failed to enable ep0out
+[    8.430398] systemd[1]: Finished Load Kernel Modules.
+[    8.445084] systemd[1]: Finished Remount Root and Kernel File Systems.
+[    8.461365] systemd[1]: Activating swap /swapfile...
+[    8.477192] systemd[1]: Mounting FUSE Control File System...
+[    8.493465] systemd[1]: Mounting Kernel Configuration File System...
+[    8.516429] systemd[1]: Condition check resulted in Rebuild Hardware Database being skipped.
+[    8.521354] systemd[1]: Condition check resulted in Platform Persistent Storage Archival being skipped.
+[    8.529024] systemd[1]: Starting Load/Save Random Seed...
+[    8.545002] systemd[1]: Starting Apply Kernel Variables...
+[    8.561219] systemd[1]: Starting Create System Users...
+[    8.569666] Adding 409596k swap on /swapfile.  Priority:-2 extents:1014 across:1047280k SS
+[    8.583100] systemd[1]: Activated swap /swapfile.
+[    8.597015] systemd[1]: Started Journal Service.
+[    8.709075] systemd-journald[217]: Received client request to flush runtime journal.
+[   10.405555] proc: unrecognized mount option "hidepid=invisible" or missing value
+[   11.061532] [BT_RFKILL]: rfkill_rk_set_power: set bt wake_host high!
+[   11.117789] [BT_RFKILL]: ENABLE UART_RTS
+[   11.230893] [BT_RFKILL]: DISABLE UART_RTS
+[   11.235422] [BT_RFKILL]: bt turn on power
+[   11.248151] [BT_RFKILL]: Request irq for bt wakeup host
+[   11.253706] [BT_RFKILL]: ** disable irq
+[   11.625764] brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43455-sdio for chip BCM4345/6
+[   11.945177] brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43455-sdio for chip BCM4345/6
+[   12.050246] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6 wl0: Feb 27 2018 03:15:32 version 7.45.154 (r684107 CY) FWID 01-4fbe0b04
+[   12.795741] file system registered
+[   12.912214] Generic PHY stmmac-1:00: attached PHY driver [Generic PHY] (mii_bus:phy_addr=stmmac-1:00, irq=POLL)
+[   12.918040] dwmac4: Master AXI performs any burst length
+[   12.922334] rk_gmac-dwmac fe010000.ethernet eth0: No Safety Features support found
+[   12.926696] rk_gmac-dwmac fe010000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+[   12.931372] rk_gmac-dwmac fe010000.ethernet eth0: registered PTP clock
+[   12.936453] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[   13.466448] read descriptors
+[   13.470468] read strings
+[   13.948914] rk_gmac-dwmac fe010000.ethernet eth0: Link is Up - 1Gbps/Full - flow control off
+[   13.952961] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[   14.431540] [BT_RFKILL]: rfkill_rk_set_power: set bt wake_host high!
+[   14.460942] [BT_RFKILL]: ENABLE UART_RTS
+[   14.570939] [BT_RFKILL]: DISABLE UART_RTS
+[   14.574877] [BT_RFKILL]: bt turn on power
+[   14.578822] [BT_RFKILL]: Request irq for bt wakeup host
+[   14.582815] [BT_RFKILL]: ** disable irq
+[   14.866362] of_dma_request_slave_channel: dma-names property of node '/serial@fe650000' missing or empty
+[   14.872709] ttyS1 - failed to request DMA, use interrupt mode
+[   14.879457] ttyS1 set divisor fail, quot:156 != dll,dlh:0
+[   14.885833] ttyS1 set divisor fail, quot:156 != dll,dlh:0
+[   14.892052] ttyS1 set divisor fail, quot:13 != dll,dlh:0
+[   15.107258] ttyS1 set divisor fail, quot:1 != dll,dlh:0
+[   16.054640] ttyS1 set divisor fail, quot:13 != dll,dlh:0
+[   16.265568] ttyS1 set divisor fail, quot:1 != dll,dlh:0
+[   17.038068] Bluetooth: Core ver 2.22
+[   17.041984] NET: Registered protocol family 31
+[   17.045785] Bluetooth: HCI device and connection manager initialized
+[   17.049719] Bluetooth: HCI socket layer initialized
+[   17.053589] Bluetooth: L2CAP socket layer initialized
+[   17.057483] Bluetooth: SCO socket layer initialized
+[   17.173228] Bluetooth: HCI UART driver ver 2.3
+[   17.176949] Bluetooth: HCI UART protocol H4 registered
+[   17.180494] Bluetooth: HCI UART protocol ATH3K registered
+[   18.778879] proc: unrecognized mount option "hidepid=invisible" or missing value
+[   19.433513] IPv6: ADDRCONF(NETDEV_UP): wlan0: link is not ready
+[   27.931790] [drm:dw_hdmi_rockchip_set_property] *ERROR* failed to set rockchip hdmi connector property hdmi_color_depth_capacity
+[   27.931845] [drm:dw_hdmi_rockchip_set_property] *ERROR* failed to set rockchip hdmi connector property hdmi_output_mode_capacity
+[  628.581788] rockchip-vop2 fe040000.vop: [drm:vop2_crtc_atomic_disable] Crtc atomic disable vp0
+.
