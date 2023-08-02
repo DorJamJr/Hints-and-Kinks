@@ -94,3 +94,33 @@ https://pypi.org/project/OrangePi.GPIO/			// failed the compile
 And another
 https://github.com/eutim/OPI.GPIO   // clone of OPi.GPIO (source still available)
 
+
+080223
+Searching for possible solutions to using GPIO.add_event_detect() with a callback, I came across this:
+   https://raspberrypi.stackexchange.com/questions/104213/callback-parameters-to-gpio-add-event-detect
+which suggests the use of the "lambda" function to make the callback work. So I tried it... and using this form of the GPIO command:
+  GPIO.add_event_detect(PB1, GPIO.FALLING, callback=lambda x: int_service())
+where the callback is specified as:   lambda x: int_service()
+          rather than:                int_service
+makes it work. 
+(Note: I also tried "callback=int_service()" (without the lambda x:) and that does NOT work)
+
+I wrote PBL.py test code and that runs (see Hints-and-Kinks/RockPi/testCode/PBL.py) 
+So the magic sauce is:
+   - install OPi.GPIO
+   - create radxa directory (in site-packages)
+   - copy the CM3.py file into the radxa directory
+   - copy the __init__.py file into the radxa directory
+   - in the modules using GPIO add the following code:
+         import radxa.CM3
+         from OPi import GPIO
+         GPIO.setmode(radxa.CM3.BOARD)
+   - change the calls to GPIO.add_event_detect() to use the lambda function as shown above
+   
+         
+
+
+
+
+
+
