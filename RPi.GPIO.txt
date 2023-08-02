@@ -1,0 +1,96 @@
+Notes on trying to get RPi.GPIO to work on Radxa CM3
+
+There are actually a few flavors of RPi.GPIO...
+   - The original one... install with: pip install RPi.GPIO  (this one by Ben Croston)
+   - The Richard Hull port of the original RPi.GPIO to OPi.GPIO (suitable for Orange Pi), 
+        install: pip install OPi.GPIO
+        Note: A clone of OPi.GPIO is stored on our github/connectbox site as RPi.GPIO (but NO source code)
+   - RPi.GPIO_NP_CB (stored on CB GitHub space)... which is a fork of the original RPi.GPIO (Croston) which we modified for use by NanoPi (source code included). This version is currently used by NanoPi versions of CB
+
+Results at trying to use the various versions, just trying to do the initial import in python:
+   - The original complains we aren't a Raspberry Pi
+   - The OPi one actually imports ("from OPi import GPIO")
+   - The NP_CB one complains we aren't a NEO
+
+So the OPi one is the only one with a chance for CM3. (Note: it appears that the source code has been removed from the OPi.GPIO site: https://github.com/rm-hull/OPi.GPIO/tree/master  ... which is a shame)
+
+The included files in the OPi.GPIO (see our copy at connectbox/RPi.GPIO) includes some hope that it might work with a radxa machine as it has some modifier py files (ex: radxa/zero.py) which contain instructions for use, like:
+    Usage:
+
+.. code:: python
+   import radxa.zero
+   from RPi import GPIO
+
+   GPIO.setmode(radxa.zero.BOARD) or GPIO.setmode(radxa.zero.BCM)
+
+This seems to indicate that with the proper "personality" file (in our case, like, CM3.py) that the OPi.GPIO package could work on the CM3.
+
+So I created CM3.py based on the guide of radxa/zero.py and then did an install (from net) of the OPi.GPIO package
+
+On the CM3:
+
+ssh root@10.0.0.21
+mkdir /jim
+cd /jim
+mkdir jim_venv
+python -m venv /jim/jim_venv
+cd /jim/jim_venv/
+source bin/activate
+pip install OPi.GPIO
+cd lib/python3.9/site-packages
+mkdir radxa
+cd radxa
+cp CM3.py .
+cp __init__.py .		# these two copies really scp from my source area on the Mac
+cd /jim/jim_venv
+
+Then ran a python command line session:
+python3
+  >>> import radxa.CM3
+  >>> from OPi import GPIO
+  >>> GPIO.setmode(radxa.CM3.BOARD)
+
+All of those commands worked ...  no errors
+
+So our PB2 is on equivilant of header pin 7... so we will try:
+  >>> GPIO.setup(7, GPIO.IN)    // no error
+  >>> def pressed():
+  ...   print("pressed")
+  ...
+  >>> GPIO.add_event_detect(7, GPIO.FALLING,callback=pressed,bouncetime=125)  // (bounce not fully supported)
+
+  push button but no response by code...
+  Try lighting the LED   Amber LED on GPIO6 (= pin31)
+
+  >>> GPIO.setup(31, GPIO.OUT)
+  >>> GPIO.output(31, GPIO.HIGH)			// turns off LED
+  >>> GPIO.output(31, GPIO.LOW)				// turns on LED
+
+So the output functions work and the map CM3.py works...
+Let's try reading a pin (like the PB2 pin, 7)
+
+  >>> print (GPIO.input(7))				// shows "1" with button up, "0" with button pushed
+
+So the map also works for general input reading (polling)  
+
+Curiously...
+   >>> GPIO.add_event_detect(7, GPIO.FALLING,callback=pressed)  // (bounce not fully supported)
+         [push the button]
+   >>> GPIO.remove_event_detect(7)    // throws error re; arguments (too many) IF I pushed the button
+
+but...
+
+   >>> GPIO.add_event_detect(7, GPIO.FALLING,callback=pressed)  
+         [no push of the button]
+   >>> GPIO.remove_event_detect(7)    // does not throw an error... so the switch is being detected...
+
+
+(Code PB2.py written to capture the above)   
+
+
+Another GPIO...
+https://pypi.org/project/OrangePi.GPIO/			// failed the compile
+
+And another
+https://github.com/eutim/OPI.GPIO   // clone of OPi.GPIO (source still available)
+

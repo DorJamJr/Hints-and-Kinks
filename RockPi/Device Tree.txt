@@ -1,0 +1,26 @@
+Device trees... 
+
+Where are they stored:  /boot/dtbs/($-uname -r)/rockchip
+How to read a .dtb file
+   apt-get install device-tree-compiler
+   dtc -I dtb -O dts <file-tree-name>.dts <file-tree-name>.dtb
+   then we can vi the file-tree-name.dts
+
+Which (of the many) dtb files are being used?
+  One source says the info is compiled into the kernel
+  Another answer (more likely) is that the hardware version is detected during the boot process (/proc/cpuinfo ??) and that info is used to select the correct dtb file
+
+/boot/extlinux/extlinux.conf has entries for 
+  /boot/vmlinuz... (kernel); 
+  /boot/initrd.img... (initrd);
+  /boot/dtbs/4.19...   (devicetreedir)
+  /boot/dtbs/4.19.../rockchip/overlay/rk3668-fiq-debugger...dtbo;
+           rk3568-disable-npu.dtbo   (fdt ovrerlays)
+
+Here is an interesting post on making GPIO7 an output using overlays...
+https://raspberrypi.stackexchange.com/questions/43825/how-do-i-make-a-device-tree-overlay-for-just-a-single-gpio           
+
+Also of much interest... https://wiki.radxa.com/gpiod
+
+
+
