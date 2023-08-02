@@ -1,0 +1,101 @@
+Random facts:
+- __init.py__ is a special (often empty) file that indicates that the directory it is a python package
+
+  so, for example, neo-battery-shutdown has a directory site-packages/neo-batterylevelshutdown that has an __init.py__ present, SO the directory neo-batterylevelshutdown is, itself, a python package
+
+  in cli.py we find "import RPi.GPIO as GPIO"... there is a directory site-packages/RPi which contains a file __init.py__, so that means that the directory RPi is a python package. In that directory we find another directory, "GPIO", so that means that RPi.GPIO is referencing the python package GPIO in directory RPi. (??? seems to dead end there...)
+
+  Turned on venv for /usr/local/connectbox/battery_tool_venv
+  started python command line session
+  tried "import RPi.GPIO as GPIO"
+    error .../RPi/GPIO/__init__.py line 23 in <module> "from RPi.__GPIO import *"
+
+    open the specified __init__.py file... yup... that's what is says... so is there an RPi/_GPIO file?
+
+    well there IS a "_GPIO.cpython-39-aarch64-linux-gnu.so" file... what is the .so?
+    Answer: the .so is a shared library file (similar to a dll in windows)...
+
+    So best guess is that our RPi.GPIO library is compiled into .so
+    Not clear how to do that at this point... I'm sure we can learn
+
+Meanwhile, this site is interesting: https://osoyoo.com/2022/07/20/rock-pi-4-gpio-control/
+Instructions are to apt-get python-periphery
+In our case (HAT 1.7.2) the amber LED is on GPIO6
+Trying a simple program suggested by the osoyoo website to blink the LED returns and error: resource busy
+Trying a simple "echo 6 > /sys/class/gpio/export" also returns a device busy error...
+
+Hmmm... now where??
+
+Some suggest that the device tree may have comandeered the io pin...
+
+some interesting links:
+
+pyRock:  https://github.com/radxa/pyRock	gpio library?
+
+(The following run from directory /jim/jim_venv with the jim_venv enabled via "source bin/activate")
+   apt-get install gcc python3-dev
+   apt-get install git
+   git clone https://github.com/radxa/pyRock.git
+   cd pyRock
+   python3 setup.py install
+
+   run python3 then:
+   >>> from pyRock import gpio
+
+   Compile warned about wrong processor...
+   example calls PIN0PA0 but this throws error "Not defined"
+   Note that the doc on github indicates this package was written 9 years ago... so probably no longer valid...
+
+
+https://wiki.radxa.com/RockpiX/dev/libmraa
+   not useful... package for processor amd64 (we us arm64)
+
+
+https://wiki.radxa.com/Gpiod
+  shows some promise... I've done the install :  apt install gpiod -y
+  run list command:  gpioinfo
+    shows lots of "unnamed, unused" pins
+  run read pin:  gpioget 4 4    (gpiochip 4, line 4... which list shows as "pi-led-green" output) 
+    this gave "Device or resource busy"
+  tried the unused pin after that: gpioget 4 5    this returned "0"   ... hopeful
+  --- Our PB1 switch is on GPIO4 of the RPI diagram... try gpioget 0 4
+  didn't work (returned 0)
+  That is on CM4 connector pin 54 ... on Rock IO pin 54 is called GPIO2_B3 on the CM3 IO breakout
+
+Calculation example
+  GPIO4_D5 = 4*32 + 3*8 + 5 = 157
+   (A=0, B=1, C=2, D=3) 
+
+In /sys/class/gpio I tried :  
+  echo 157 > export      // no error, /sys/class/gpio157 was created  
+  running gpio info shows new entry:
+     gpiochip4, line 29: "unnamed "sysfs" input active-high used
+
+So PB2 is GPIO2_B3 => 2*32 + 1*8 +3 = 75   (gpiochip2 line 11)  
+  gpioget 2 11 returns 1  (list shows unused)
+  try echo 75 > export
+    gives /sys/class/gpio/gpio75
+  gpioinfo now showing   gpiochip2 line 11: "sysfs" input active-high used
+  gpioget 2 11 shows resource busy
+  cat /sys/class/gpio/gpio75/volue retuns "1" for both PB2 pushed and not  ??
+
+  3d5 = 3*32 + 3*8 + 5 = 125
+
+  The 3D5 came from https://wiki.radxa.com/Rock3/CM3/IO/GPIO (header for CM3 IO) 
+  Using sysfs 
+      cd /sys/class/gpio   
+      echo 125 > export				// creates folder gpio125
+      cat gpio125/value				// give "1" for switch open
+      cat gpio125/value 			// gives "0" for switch pushed
+      echo 125 > unexport			// removes folder gpio 125
+
+  Can we use the gpiod library?
+      gpioinfo shows gpiochip3 line 29 is available
+      gpioget 3 29    returns 1 with switch open, 0 with closed ... YEAH!!
+
+      amber LED is on CM4 - GPIO6 - 100 pin connector pin 30 -> CM3 IO -> Conn1 GPIO2_B1
+      translates to 2*32 + 1*8 + 1 = 73
+      (gpiochip2 line 9 showing "bt_default_wake_host" ... so not available with current device tree...)
+
+
+
