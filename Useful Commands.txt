@@ -93,4 +93,11 @@ deactivate                                // leave the environment
 
 pip list            // display packages
 
+systemctl enable ssh    // permenantly enable ssh
+
+Ctl-Alt-F1 switches to terminal (full screen)
+Ctl-Alt-F7 switches back to GUI screen
+
+
+
 

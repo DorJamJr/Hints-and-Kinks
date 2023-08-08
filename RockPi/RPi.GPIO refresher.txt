@@ -97,5 +97,11 @@ So PB2 is GPIO2_B3 => 2*32 + 1*8 +3 = 75   (gpiochip2 line 11)
       translates to 2*32 + 1*8 + 1 = 73
       (gpiochip2 line 9 showing "bt_default_wake_host" ... so not available with current device tree...)
 
+  Found the translation between our CM4 gpio numbering (100 pin connector) and the CM3 pin number format
+  	amber - GPIO6 - GPIO0_C5 - 
+  	    gpioset -m signal 0 21=0    // turns on amber, but waits for ctl-c to return
+  	    gpioset -m exit 0 21=0  	// turns on the amber and exits 
+  	         (there is a warning about this on the debian man page for this command:
+  	            https://manpages.debian.org/experimental/gpiod/gpioset.1.en.html)
 
 

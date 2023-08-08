@@ -94,7 +94,6 @@ https://pypi.org/project/OrangePi.GPIO/			// failed the compile
 And another
 https://github.com/eutim/OPI.GPIO   // clone of OPi.GPIO (source still available)
 
-
 080223
 Searching for possible solutions to using GPIO.add_event_detect() with a callback, I came across this:
    https://raspberrypi.stackexchange.com/questions/104213/callback-parameters-to-gpio-add-event-detect
@@ -119,8 +118,26 @@ So the magic sauce is:
    
          
 
+080523
+The Amber PA6 voltage on the RM3 is 1.491 V and the GPIO reads it as low ...  adding a pull up (20k?) brings the voltage to 1.58V which is enough to read it as high
 
 
+080723
+OPi.GPIO module does not need to clear the event_detect status of a pin to read the pin... so the code in buttons.py for RM3 can do without the remove and reinstate of the event status of PB1 and PB2
 
+The "connectboxmanage" facility is missing installed library "urllib3".... 
+   install it with "pip install urllib3"
 
+ALSO... the command "connetboxmanage get topten" executed on line 71 of page_stats.py is throwing a  
+   warning:
+
+   perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+   LANGUAGE = (unset),
+   LC_ALL = (unset),
+   LC_CTYPE = "C.UTF-8",
+   LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+   
 

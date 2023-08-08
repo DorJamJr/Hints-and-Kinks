@@ -95,6 +95,12 @@ Perhaps now would be a good time to wrap all we know about build into ansible an
 - 
 
 
+080823
+
+Ctl-Alt-F1 switches to terminal (full screen)
+Ctl-Alt-F7 switches back to GUI screen
+
+If you want to boot to terminal, edit /etc/X11/default-display-manager to make the default a non existant manager... (Normally contains: /usr/sbin/lightdm,  so change to, like /usr/sbin/xlightdm)
 
 
 

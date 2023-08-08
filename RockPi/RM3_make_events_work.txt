@@ -1,0 +1,63 @@
+080223
+
+Steps taken im modifying RM3 CB code to make neo-battery-shutdown work
+
+cd /usr/local/connectbox/battery_tool_venv
+source bin/activate
+pip install OPi.GPIO
+cd lib/python3.9/site-packages
+mkdir radxa
+cd radxa
+cp CM3.py .
+cp __init__.py .		# these two copies really scp from my source area on the Mac
+
+
+Create branch of connectbox-hat-service  080223_dev
+Edit cli.py 
+   imports
+
+
+080723
+
+Nuggets learned:
+- The OPi.GPIO library allows a pin to be configured as an event trigger AND be read as an input
+   so we don't need to mess with clearing interrupt assignment and then re-enabling
+
+- The "connectboxmanage" facility is missing installed library "urllib3".... 
+   install it with "pip install urllib3"
+
+- install the RM3_20230727.img image to uSD and put in target machine 
+   (CM3 on CM4 1.7.2 HAT (modified)) and boot  
+
+- Enable the virtual environment at /usr/local/connectbox/battery_tool_venv  using 
+   source bin/activate
+
+- install OPi.GPIO   (pip install OPi.GPIO)      
+- install radxa directory at site-packages
+- scp copy (local)...GitHub/RPi.GPIO/radxa/CM3.py to site-packages/radxa
+- scp copy (local)...GitHub/RPi.GPIO/radxa/__init__.py to site-packages/radxa
+
+- scp the following files from the local connectbox-hat-service repo (080223_dev branch) 
+   to  /usr/local/connectbox/battery_tool_venv/lib/bin/python3.9/site-packages/neo_batterylevelshutdown 
+   directory (overwriting the existing versions):
+      - cli.py
+      - hats.py
+      - buttons.py
+      - globals.py
+
+- cd to /usr/local/connectbox/battery_tool_venv/lib/bin/python3.9/site-packages/neo_batterylevelshutdown  and from there, run "python cli.py" to run the neo-battery-shutdown
+package in quasi debug using print statements... also lets you see syntax and other errors
+
+
+*** And now we have a "working" RM3 based ConnectBox ***
+   - ToDo:
+      - The shutdown facility (hold PB1 for 8 seconds) will hardware power off, but the shutdown IRQ
+        architecture doesn't seem to be working
+      - Incorporate all of the above to do a fresh RM3 build 
+
+
+080823
+The problem with the shutdown is that the IRQ line is tied to GPIO15 (RM3 conn pin 10) which is assigned 
+  to UART2_RX_M0. I had cut this trace and wired it to a 3 pin connector for serial debug communications... Checking for the RPi CM4 board we find the same issue... perhaps on next layout we choose another pin? Looking at the breakout, GPIO27 (pin 13) is assigned PWM0_M0 which I don't think is a conflict... that pin is on the 100 pin header at pin 48
+
+
