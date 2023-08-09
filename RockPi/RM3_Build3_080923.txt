@@ -59,9 +59,10 @@ neo-battery-shutdown.service located at /etc/systemd/system
     [Unit]
     Description=ConnectBox NEO Battery Shutdown Service
 
+
 +++
 I did that in the target code (can't find the source of that file...??)
-
+Edit file at: ansible/roles/hat-service/templates/neo-battery-shutdown.service.j2
 
 
 
