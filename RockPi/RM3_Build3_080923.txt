@@ -1,0 +1,68 @@
+08/09/23
+
+Bringup of build RM3_20230809
+
+This build based on the RM3_20230727 image with changes to the connectbox-hat-service files
+  - cli.py
+  - hats.py
+  - buttons.py
+  - globals.py
+
+(see repo branch 080223_dev)
+
+The 080223_dev branch was combined back into the master branch before this build. Also, some changes were made to the ansible files to add installation for the required libraries, mainly adding OPi.GPIO and radxa/CM3.py to the connectbox/battery_tool_venv venv (see repo notes for specifics).  
+
+Here we record the results of first boot of that image with target Rock CM3 board on CM4 HAT 1.7.2...
+
+Timer started at power on
+
+0:00  	power on
+0:07    RM3 green led on
+0:41	debian logon screen (usb keyboard working)
+3:00    still at debian logon
+4:00    login and check status of PxUSBm - showing status Failure... so it isn't running...
+
+Check for build items...
+OPi and radxa are there
+urllib3 not there
+
+cd /usr/local/connectbox/bin
+python PxUSBm.py
+  fails:  command fdisk not found
+  do :   sudo apt install fdisk
+         fdisk is already the newest version (2.36.1-8+deb11u1)
++++
+  need to add to $PATH /usr/sbin
+         export PATH=$PATH:/usr/sbin
+         (ansible code to do that)
+         - name: Add /usr/sbin to system-wide $PATH.
+           copy:
+             dest: /etc/profile.d/my-path.sh
+             content: 'PATH=$PATH:/usr/sbin'
+    
+  fix typo in PxUSBm.py line 460 
+  
+After fixing PxUSBm.py the RM3 did a reboot (resize)
+
+We get to debian root login... no OLED yet
+ifconfig/iwconfig say we are up (iphone agrees)
+systemctl status neo-battery-shutdown shows "Failed to start"  "Start request repeated too quickly"
+
+but if I run (from venv) python cli.py, the battery-shutdown service works
+(works until I try to go to a statistics page and error for urllib3 missing)
++++
+   pip install urllib3			// not from venv, just normal
+   (successful)
+
+neo-battery-shutdown.service located at /etc/systemd/system
+  Kirk suggests adding "After=network.target"  under:
+    [Unit]
+    Description=ConnectBox NEO Battery Shutdown Service
+
++++
+I did that in the target code (can't find the source of that file...??)
+
+
+
+
+
