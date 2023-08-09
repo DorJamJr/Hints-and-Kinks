@@ -1,0 +1,26 @@
+080923
+
+Build RM3_20230809  (the second one... first was renamed to RM3_20230809-0)
+
+This build based on first 20230809 build with mods to ansible to handle issues discovered
+
+0:00 	power on 
+0:07    RM3 green LED on
+1:30 	reboot screen
+2:55	second reboot
+3:33	debian logon screen
+4:58	systemctl PxUSBm  looks good
+		systemctl neo-battery-shutdown  failed restart too quickly
+		/etc/systemd/system/neo-battery-shutdown   does have the added line (but it didn't work)
+
+		Try systemctl start neo-battery-shutdown
+		that worked
+
+		still missing urllib3    (so will crash neo-battery-shutdown when loading statistics page)
+
++++ add install of urllib3 later... perhaps in hat-service tasks?
+
++++ add to PxUSBm.py (near line 1475... before "while x==x")
+       	process = os.popen('systemctl start neo-battery-shutdown')
+       	process.close()
+       			
