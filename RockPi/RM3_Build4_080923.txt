@@ -36,3 +36,62 @@ Made the changes... build again
 Looks like I didn't add the startup lines to PxUSBm.py   AARGH!
 Added by hand and restarted the PxUSBm service and it is working fine
 (Note... the urllib3 was installed with the new ansible...)
+
+
+Build again
+
+0:00 	power on
+0:07 	RM3 green LED on
+1:30 	reboot screen
+2:52	second reboot
+3:32 	debian login    but no OLED
+5:08 	splash screen
+
+YEAH!!
+
+081023
+Kirk published a new PxUSBm.py.
+Test on RM3 target by:
+  stop PxUSBm service
+  copy current PxUSBm.py to xPxUSBm.py
+  push new usr_local_connectbox_bin_PxUSBm.py to /usr/local/connectbox/bin
+  copy usr_local_connectbox_PxUSBm.py to PxUSBm.py
+  run   python PxUSBm.py  and watch for issues
+  If all ok...
+  delete /usr/local/connectbox/expand_progress.txt
+  power down
+  power up and watch timings...
+
+  Results:
+  Stop PxUSBm and neo-battery-shutdown services
+  0:00  	python PxUSBm.py
+  0:07		splash screen
+  all seems normal...
+
+  do a reboot now   start clock at HDMI no signal screen
+  0:00 		HDMI no signal
+  1:24 		first reboot
+  2:49		second reboot
+  3:25		OLED  (Amber coincident)
+  3:30  	debian login
+
+  normal power down, power up
+  0:00 		push PB1
+  0:06 		I -> O screen
+  0:22 		power is off
+
+  0:00 		push PB1
+  0:34		OLED / Amber
+
+  The power off screen (I->O) is on until power removed, then is on again at power on... curious... no power on the OLED... so it isn't holding... the processor seems to be re-establishing that ..??  ... 
+   -- power down, then remove/replace OLED, 
+      then turn on... no I->O on booting... 
+   -- power down ... wait 1 minute before power up... get I->O... 
+   -- power down... quickly remove/replace OLED ... no I->O
+   -- power down... measure OLED pins... clk=0.53, dat=0.53, Vdd=0.4
+   -- doesn't seem to be decaying... (12:10 PM, 081023) 
+   
+
+
+
+
