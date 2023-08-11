@@ -1,0 +1,34 @@
+CM4_081023
+
+Initial power up
+
+0:00 	power on
+not booting...
+
+??? 
+Tried a couple times... won't boot
+
+Tried uSD 072723 - biits fine
+Nothing in the boot partition!   ???
+
+Start build again...
+
+Rpi Bullseye wants keyboard setup and new user name... 
+(used "j" and "j" then change to root after boot)
+
+Build CM4_20230811.img done... booting
+0:00  	power on ... we are booting
+1:14	reboot?
+1:44	reboot 2
+2:00 	login/splash 
+2:40 	amber
+
+seems all is ok
+
+power down and power back up...
+
+
+0:00 	power on PB1 pushed
+0:27 	OLED & amber
+
+Looks like a good image...

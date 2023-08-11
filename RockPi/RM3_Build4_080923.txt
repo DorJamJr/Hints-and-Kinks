@@ -90,7 +90,14 @@ Test on RM3 target by:
    -- power down... quickly remove/replace OLED ... no I->O
    -- power down... measure OLED pins... clk=0.53, dat=0.53, Vdd=0.4
    -- doesn't seem to be decaying... (12:10 PM, 081023) 
-   
+
+No code solution... the os.system("shutdown now") call doesn't return (until shutdown complete!) so can't turn off screen after calling for the shutdown
+
+Try the RPi running v 20230719 code ...Not a problem on RPi... Voltage at pins: clk= 0, dat=0, Vdd=0
+
+So this is hardware issue with RM3 board... 
+More info... the HAT (battery) that I am using is giving about 1V on the 5V line in the off state... so it is likely that the issue is my 5V system on the BattBoard...
+
 
 
 
