@@ -1,0 +1,1 @@
+insmod /usr/lib/modules/5.15.93-sunxi/kernel/drivers/net/wireless/rtl8812au/88XXau.ko.xz 
