@@ -99,6 +99,22 @@ So this is hardware issue with RM3 board...
 More info... the HAT (battery) that I am using is giving about 1V on the 5V line in the off state... so it is likely that the issue is my 5V system on the BattBoard...
 
 
+081023
+Kirk has new PxUSBm... use it on RM3
+0:00 	reboot blue screen
+0:45 	debian login (no OLED) typo in PxUSBm ("logginig")
+
+from 2nd boot blue screen
+0:35   OLED
+0:40 	amber LED
+
+pwr up 2
+0
+0:07
+0:28  amber + splash
+
+
+
 
 
 
