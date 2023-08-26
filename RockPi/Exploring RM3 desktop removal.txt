@@ -1,0 +1,72 @@
+Exploring RM3 desktop removal
+
+082523
+
+The build image we used for the RM3_20230824.img was:
+   radxa-cm3-io-debian-bullseye-xfce4-arm64-20230317-0810-gpt.img
+the title of which seems to imply an xfce4 desktop...
+
+The CB image resulting from the build has a desktop, but no applications along
+ the side or an applications menu. A right click of the mouse on the desktop
+ shows a pulldown with some applications... some work (ex, dictionary, Ristretto Image Viewer, Firefox, Task Manager, all system tools (xterm, uxterm, file manager), multimedia tools, utilities, settings)   
+
+Trying to execute "obconf" we get an error "obconf... No such file or directory"
+  and the dialog banner reads "Openbox"... 
+
+So what is relationship between xfce4 and openbox??
+ From what I can tell on the net, Openbox is a window manager used in place of the xfwm (xf window manager (?)) tool. It is installed on top of xfce4
+
+Experiments...
+- Start with a fresh copy of the base image (20230317) and boot to login; 
+   this gives a debian desktop with menu bar at top and icons on left (Filesystem root; boot; File System; Home) 
+     The pulldown menu from top has an About. Opening that gives an option"
+      About, which revealt: "Xfce is a collwction of programs that together provice a full featured desktop environment" and then lists the programs that make up the core: xfwm4 (window manager); xfce4-panel (Panel); xfdesktop (Desktop manager); thunar (File manager); thunar-volman (Volume manager); xfce4-session (Session Manager); xfce4-settings (Setting System); xfce4-appfinder (Application Finder); xfconf (Settings Daemon); garcon (Menu Library); tumbler (Thumbnails Service);
+- login (rock/rock) and create logon for root (connectbox)
+- logout then log back in as root (and we get same desktop)
+- which openbox -> /usr/bin/openbox
+- ls /usr/share/xsessions shows lightdm-xsession.desktop, openbox.desktop and xfce.desktop...
+- 
+
+- Try removing openbox with apt-get remove openbox
+("using /usr/bin/xfwm4 to provide /usr/bin/s-window-manager in auto mode")
+- succeeds...  do "reboot now"... login as root... same desktop
+- try " apt-get remove --auto-remove openbox " to remove support packages (pic taken)... succeeds... reboot... login as root... ok
+- try "apt-get purge openbox "... reboot... login... OK
+- 
+
+Try removing Xfce4... 
+- try "apt-get remove xfce4-* "  (34 packages removed)
+- then "apt-get remove xfce4" (no packages to remove... 
+   suggests "apt autoremove")
+- then "apt autoremove"   (19 packages removed... 12.7 MB space)
+- then "apt-get purge xfce4" ("xfce4 not installed so none removed")
+- reboot... login root... we have desktop "debian" in blue (normal) but no terminal... try ctl/option F2... we get terminal with full screen...
+
+- try "vi /etc/X11/default-display-manager" and comment out first line reading
+   "/usr/sbin/lightdm"
+
+- from https://www.baeldung.com/linux/boot-linux-command-line-mode
+   - cat /proc/1/comm (shows "systemd") so we do:
+      - systemctl set-default multi-user.target
+      - reboot now
+      YES!!
+
+SO... I now have what looks like a CLI image for the RM3. Let's do a shring and 
+ xz on THAT image and use it as a starting point for an RM3 build...
+
+Save as:
+   radxa-cm3-io-debian-bullseye-cli-arm64-20230317.img
+   (size of .img was 3.3 GB; size of .xz was 525 MB)
+
+A bit of exploring on the image...
+  - to get size of directory use "du -sh <directoryName>"
+  - desktop files are generally in /usr/share/applications (212K)
+  - /usr/share/X11   (5.9M)
+  - /usr/share       (497M)
+
+  So there is some opportunity to remove more "desktop" related stuff, but this
+   is a good start. Try a build.
+
+   
+
+

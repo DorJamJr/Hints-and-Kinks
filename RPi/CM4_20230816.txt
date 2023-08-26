@@ -1,0 +1,25 @@
+CM4_20230816.img power on
+
+
+0:00	power on
+1:50	first reboot
+2:08 	login (no OLED...)
+2:54 	second eboot
+3:11 	login
+5:32	OLED, Amber, 
+
+0:00	PB1 pushed for power down
+0:20 	shutdown complete
+0:40 	power is off
+
+0:00 	PB1 pushed for power on
+0:24 	OLED, Amber, login
+1:??	Amber off
+1:37 	OLED, Amber, back on
+
+
+power down with PB1
+
+power up with PB1
+0:00	press PB1
+0:25	amber, OLED 
