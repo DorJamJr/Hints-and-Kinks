@@ -1,1 +1,14 @@
 CM4_20230814.img power up
+
+
+0:00	power on
+1:12	first reboot
+1:45 	second reboot
+1:58	logon, OLED   (amber maybe... led hidden)
+3:00	amber definately on
+
+power down: 16 sec from button push to HDMI no signal
+power up 27 sec from button push to OLED, login and amber
+
+
+

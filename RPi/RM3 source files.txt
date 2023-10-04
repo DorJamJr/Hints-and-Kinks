@@ -1,0 +1,25 @@
+RM3 source files
+
+https://github.com/radxa-build/radxa-cm3-io/releases/tag/20230401-0056
+
+  for this image, default user is "radxa" and password is "radxa"
+
+  ifconfig not available; tried "apt install net-tools" and that failed (can't locate package net-tools)
+
+  tried "sudo apt update" and then "apt install net-tools"... that worked
+
+  (note: alternate command to "ifconfig" is "ip a" but how about iwconfig??)
+
+
+OK... that image failed at the reboot, "failed to find power model mode" (and lots other fails)
+
+
+
+Let's try the previous version...
+radxa-cm3-io_debian_bullseye_cli_b20.img
+
+- login/pw = radxa/radxa
+- need to install net-tools
+
+
+
