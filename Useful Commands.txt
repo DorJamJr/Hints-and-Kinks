@@ -103,7 +103,18 @@ SEARCHING:
 find <startDir> -name <filename>
   find / -name 8812au.ko
   find / -name *.ko
-  
+
+
+turn on driver:
+insmod </path/to/driver>
+insmod /usr/lib/modules/5.15.93-sunxi/kernel/drivers/net/wireless/rtl8812au/88XXau.ko.xz 
+
+ifdown wlan0
+ifup wlan0
+systemctl restart hostapd
+systemctl restart dhcpcd
+
+
 
 
 

@@ -1,0 +1,23 @@
+NEO_20230813
+
+0:00 	power on
+1:43	first reboot
+2:15 	login...
+3:41	second reboot
+4:15	login  (no OLED, no amber)
+
+
+ifconfig both wlan0, wlan1, neither assigned AP
+iwconfig	wlan1 == REALTEK
+status dhcpcd running,,, "wlan1: no IPv6 Routers available"
+status hostapd running
+
+
+
+7:13 OLED 
+
+ifconfig ... wlan1 assigned AP address, flags 4163
+iwconfig --- wlan1 mode:managed
+status PxUSBm unexpected indent "148f/2878/0" (adapters.py line )
+  Fixed... (missing [] set)
+  AP now up (yeah!) but no amber ??

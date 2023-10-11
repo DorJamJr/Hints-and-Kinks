@@ -1,0 +1,196 @@
+Learning R
+
+
+Examples:
+
+name <- "John"		# assignment
+number <- 3			
+3 -> number 		# also valid
+number <<- 3 		# GLOBAL assignment
+
+paste (name, "is", number)		# concatinate
+
+num2 <- 5
+number + num2	# prints the sum (NUMERICS ONLY... string adds throws error)
+
+var1<-var2<-var3<-"Orange"		# assgn multiple with same value
+
+Naming rules:
+- must start with a letter or "."
+- combination of letters, numbers, "." or "_"
+  - can start with a "." but must not be followed by number (".3D" is not legal)
+- variables are case sensitive
+- variables cannot be reserved words (ex: TRUE, FALSE, NULL)
+
+Types:
+- type determined at variable assignment and can be changed by later assignment to same var name
+  myVar <- 7        # myVar of type numeric
+  MYVAr < "Hello"   # myVar now of type string
+
+- Types:
+  numeric (10.5, 55)
+  integer (1L, 55L)    # the "L" declares it is integer
+  complex (9 + 3i)
+  character or string ("hello" "K")
+  logical  (TRUE, FALSE)
+
+class(x)     # prints type of variable x
+
+
+Math operators:
+  +, -, *, /
+  x^y 			# returns x to power of y
+  x %% y 		# returns x mod y (remainder x/y)
+  x %/% y       # returns integer (quotient x/y)
+
+  max(x,y,z)	# returns largest of x, y, or z
+  min(x,y,z)	# returns smallest of x, y, or z
+  sqrt(x)
+  abs(x)
+  ceiling(x)	# round up
+  floor(x) 		# round down
+
+Strings:
+- \n is carried in multiline string assignments, so a print of such a string var will include the "/n" as literal "/n" text, like "Hello\nJim"
+
+String functions:
+  cat(x) 	# will print the string as it is entered   
+            #  (ie, \n will be interpretted as CR)
+  nchar(x)	# prints number of chars in string x 
+            # (not incl terminator) 
+  grepl("ran",x)  # is "ran" in variable x 
+                  #  (returns TRUE or FALSE)  
+  paste(x,y)   # paste strings together (space in between)
+
+Escape char:   the "\" 
+
+
+Boolean Operators:
+  x > y
+  x < y
+  x == y
+
+Conditional Operators:
+  ==, !=, >, <, >=, <=
+
+IF Statements:
+  if(x < y) {}
+  else if(y<z) {}
+  else{}		# line indents don't seem to play a role  
+
+  # nesting allowed
+
+AND and OR:
+ x<y & x>z 		# comparative AND
+ x<y | x<y 		# comparative OR
+
+WHILE Loop:
+  while (x<y){}		# example while
+  break 			# break out of loop even if condition is TRUE
+  next 				# stay in loop but skip one iteration
+
+
+FOR Loop: 
+ # "for" is used to iterate through a list (or vectors or array)
+
+  for (x in 1:10) {print (x)} 		# 1:10 is a list 1 thru 10
+
+  # in the following, list() forms a list if items to be iterated
+  for (x in list("apple", "bannana", "cherry") {print(x)}	
+  for (x in c(1,2,3,4,5,6)){print(x)}	# c() creating array??
+
+
+FUNCTIONS:
+  declaring:
+    my_function <- function() { <your code>} 
+  calling:
+    my_function()
+
+  declaring with arguments:  
+    my_function <- function(x) { <your code using variable x>} 
+  calling:
+    my_function(7)		# passing 7... which becomes x in your code
+
+  # (multiple args can be passed)
+
+  declaring with arguments with defaults:  
+    my_function <- function(x=5) { <your code using variable x>} 
+
+  return values are allowed...
+    my_function <- function(x){
+      <some code> 
+      return (x*3)
+      }  		# indents not required
+
+
+
+Functions can return not only values, but other functions declared within the function (!!). Mindful of something like a class...
+  
+EXAMPLE:
+Outer_func <- function(x) {
+  Inner_func <- function(y) {
+    a <- x + y
+    return(a)
+  }
+  return (Inner_func)
+}
+output <- Outer_func(3) # To call the Outer_func
+output(5)   
+
+(output ends up being the Inner_func with x defined as 3... then calling function "output()" is really like passing x and y initially to Outer_func).... perhaps there is a good reason for this logic, but it seems obtuse...
+
+
+RECURSION:
+
+Supports recursion...  example:
+tri_recursion <- function(k) {
+  if (k > 0) {
+    result <- k + tri_recursion(k - 1)
+    print(result)
+  } else {
+    result = 0
+    return(result)
+  }
+}
+tri_recursion(6)
+
+Tracing the flow...
+  tri_recursion(6)
+    k=6   result = 6 + tri_recursion(5) 
+       k=5   result = 5 + tri_recursion(4)
+          k=4   result = 4 + tri_recursion(3)
+             k=3   result = 3 + tri_recursion(2)
+                k=2   result = 2 + tri_recursion (1)
+                   k=1   result = 1 + tri_recursion (0)
+                      k=0    result = 0     # tri_recursion(0) ends
+                   print result=1 			# tri_recursion(1) ends
+                print result=3  			# tri_recursion(2) ends
+             print result=6					# tri_recursion(3) ends
+          print result=10 					# tri_recursion(4) ends
+       print result=15 						# tri recursion(5) ends
+    print result=21							# tri recursion(6) ends
+  COMPLETE!
+
+
+GLOBAL VARIABLES:
+  Variables created outside a function are global
+  Global variables can be created inside a function with the operator "<<-", like 
+    my_locally_created_global <<- "Jim"
+
+VECTORS:   (https://www.w3schools.com/r/r_vectors.asp)
+  Vectors are a list of items of the same type, created using c() function (these are un-ordered at creation)
+
+  my_fruits <- c("apple", "bannana", "cherry")
+  my_numbers <- c(1,2,6,17,25)
+
+  Vectors of numbers in sequence created with ":"
+  seq_nums <- 1:10
+  NOTE: can start on decimal (like 1.5) but if last number isn't part of the sequence (like 10.3) it will be ignored
+
+  length (my_fruits)	# returns count of vector elements
+  sort (my_fruits)		# sort alphabetically or numerically (increase)
+  my_fruits[1] 		# select 1st item in vector list (NOT zero based!)
+
+  short_list <- my_fruits[c(1,3)]  # new vector list of items 1 and 3
+  my_fruits[2] <- "pear"
+

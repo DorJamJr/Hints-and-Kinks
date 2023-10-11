@@ -1,0 +1,28 @@
+NEO_20230814.img bringup
+
+0:00	power on
+1:42	first reboot
+2:18	login (no OLED)
+3:34	second reboot
+4:07 	login prompt (wlan0, wlan1)
+
+status PxUSBm running
+status neo  failed to start
+7:21 	amber on Oled on
+
+SSID = Connectbox (iphone settings)
+redirect ok
+iphone splash showing blue "ConnectBox"
+admin login good
+no content so don't know about mmi stuff yet
+
+
+reboot...
+shutdown  to system halted = 10 sec
+
+0:00	power on
+0:34	login, OLED, amber
+
+
+
+
