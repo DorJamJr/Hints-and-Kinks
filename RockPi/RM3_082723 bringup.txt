@@ -1,0 +1,10 @@
+RM3_082723 bringup
+
+0:00	power on
+1:28	first reboot
+2:49	second reboot
+3:05 	login   (wlans need to be swapped... no amber yet)
+4:54 	OLED, amber
+6:30 	connect to SSID from iPhone... 
+           redirect ok, admin login ok... no "Holy Bible"
+        Try login from private window.. wi.fi  ... that works... all ok   

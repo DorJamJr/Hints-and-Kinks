@@ -1,0 +1,50 @@
+Radxa CM3 USB
+
+USB hub isn't working with RM3 on CM4 hat 1.8.5 (after making changes for boot)
+
+Scoped signals and find:
+- Osc never runs
+- reset line goes high at boot but is never pulled down 
+   (so the hub isn't being initialized)
+- Looks like a software issue??
+- look on net and find some help at: 
+  - https://forum.microchip.com/s/topic/a5C3l000000MbcjEAC/t374685
+    describes troubleshooting when we don't have power pin enabled
+  - https://microchipdeveloper.com/usb:enumeration
+    describes enumeration process
+  - https://forum.radxa.com/t/cm3-compatible-boards-with-working-usb/14366
+    describes one user experience with CM3 USB not working
+  - https://forum.radxa.com/t/cm3-cm4-io-base-b-waveshare/10291/4
+    describes hardware issues with CM3 and USB (and possible solution)
+
+  So I have tried:
+  - Solder pin 101 to gnd (no help)
+  - Add to boot/config.txt:  dtoverlay=dwc2,dr_mode=host  (no help) 
+  - echo host > /sys/devices/platform/fe8a0000.usb2-phy/otg_mode 
+    (was "otg")   (no help) (got changed back to otg) 
+
+  - run: cd /lib/systemd/system
+  - run: wget openhdfpv.org/wp-content/BaseImages/usb.service 
+  - run: chmod +x usb.service 
+  - run: systemctl enable usb    
+  - (no joy ... but we now show "host" in the otg_mode file)
+
+  (Still no nRST signal to hub... symptom of USB not enabled)
+
+  - mount uSD on RPi-4
+  - cd /media/pi/rootfs/boot
+  - sudo touch config.txt
+  - sudo vi config.txt
+    - add "dtoverlay=dwc2,dr_mode=host" and save
+  - unmount uSD and try again in target  (no joy)
+
+  - run: lsblk
+  - run: mkdir jim
+  - run: mount /dev/mmcblk1p1 jim
+  - run: cd jim
+  - run: ls 		(we find an empty config.txt file there)
+  - run: vi config.txt
+    - add "dtoverlay=dwc2,dr_mode=host" and save
+  - run: reboot now
+  - (no joy)  
+

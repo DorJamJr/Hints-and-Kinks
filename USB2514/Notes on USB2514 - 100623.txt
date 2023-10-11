@@ -1,0 +1,16 @@
+Notes on USB2514 - 100623
+
+Still fighting RM3 on HAT 1.8.5 for USB hub issues
+
+- Testing with CM4... usb bit speed is running 12MB/sec... so NOT 480Mb/sec
+- RM3 and CM4 booting on same HAT... no changes... 10K pull down on reserved pin
+  is in place... CM4 seemed to tolerate that...
+- Not seeing wiggle on 2514 pins 30 & 31 (??) which is usb to RM3/CM4
+- USB_OTG_ID not tied to gnd
+- 2514 pin 8 (HD4_N) is low swinging high, pin 9 (HD4_P) is high swinging low
+- 2514 pins 30/31 not swinging with 8&9
+- RM3 doesn't like to boot with the HDMI monitor connected
+- W/o HDMI... boot... pin 9 wiggling... we have VBus power (so I THINK the hub 
+   is working) but w/o HDMI I can't see keystrokes... 
+- Wiggle the hdmi connector are got it to boot... then we do see keystrokes...
+- Keys... external oscillator, ground the OTG sense pin (pin 101)   
