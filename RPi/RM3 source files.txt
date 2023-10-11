@@ -20,6 +20,19 @@ radxa-cm3-io_debian_bullseye_cli_b20.img
 
 - login/pw = radxa/radxa
 - need to install net-tools
+- same error at ansible reboot step
+
+
+Tried b19, but no login/pw combos work...
+
+
+Go back another version to:
+radxa-cm3-io-debian-bullseye-xfce4-arm64-20230317-0810-gpt.img
+
+login/pw: rock/rock
+ifconfig is loaded
+
+
 
 
 

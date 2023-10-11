@@ -1,1 +1,8 @@
 RM3_20230824.img bringup
+
+0:00	power on
+1:29	first reboot
+2:43	second reboot
+3:11 	logon  (wlan0/1 need to swap...)
+4:56	swap complete, OLED, amber
+6:15	 iphone logged in, redirect good, splash missing "Holy Bible"

@@ -67,6 +67,106 @@ A bit of exploring on the image...
   So there is some opportunity to remove more "desktop" related stuff, but this
    is a good start. Try a build.
 
-   
+
+/boot partition issues...
+- needs to be 4G but after shrink just 2.7G
+- (shrink process touches the source uSD to shrink the partitions before we save the image)
+
+Basic problem... when we do the shrink (as in a CB image) we depend on the PxUSBm code to restore the file size... we need to do something similar for our 
+base build image. So how big do we want the image to be? How big is a downloaded image from web?
+- Start with an 8GB uSD and burn the Radxa bullseye image
+- boot... rock/rock
+- sudo passwd root   connectbox
+- lsblk shows mmcblk1 7.4G
+              mmcblk1p1 512M
+              mmcblk1p2 6.9G
+   so I think the image is 6.9G
+- apt-get remove openbox
+-   df -k shows mmcblk1p2     2082392 blocks used   32%
+    so the os is closer to 2.3 G (which is close to the shrink size of the CLI image I created)
+- apt-get remove --auto-remove openbox
+- apt-get purge openbox
+
+- apt-get remove xfce4-* 
+- apt autoremove
+- cat /proc/1/comm (shows "systemd") so we do:
+- systemctl set-default multi-user.target
+- reboot now
+- df -k showing 31% (2089396 1K blocks used)
+
+- shutdown now
+
+Pull uSD and use dd to create an image with
+- cd /home/pi/connectbox
+- lsblk		// find /dev/sdb2 is the one of interest
+- sudo umount /dev/sdb2
+- sudo e2fsck -f /dev/sdb2
+- sudo resize2fs /dev/sdb2	-f 1000000	// make it 4GB ??
+- USE parted TO MAKE PARTITION SIZE 4.5GB  ??
+- sudo dd if=/dev/sdb of=Images/radxa-bullseye-cli-031723.img
+
+PROBLEM ISN"T RESIZE... PROBLEM IS PARTED (partition size!)
+
+
+
+082723--- Rethink...
+
+Starting with 8GB uSD, we really want to just expand the /dev/sd2 file size
+ to be the full size of the partition. Then do a dd to capture the image, then
+ an xz to get the image to a reasonable size. Essentially, we want as big a filesize as we can get (ie, all of the partition). When we build a CB image,
+ the shrink process will do the parted function to get the partition as small
+ as possible so it is a small distribution. When the CB first boots, it will expand the partition to the full size of the uSD and the file size to the full
+ size of the partition.
+
+ - resize2fs must be done on unmounted partition
+ - lsblk shows attached hardware
+ - df -k shows mounted file structure
+
+Summary for creating a CLI version
+ - start with 8 GB uSD
+ - use Etcher to burn xfce bullseye to the uSD
+   (radxa-cm3-io-debian-bullseye-xfce4-arm64-20230317-0810-gpt.img.xz)
+ - put uSD in target and boot... rock/rock login; enable root login; 
+    login as root
+ - remove desktop code:
+   - run: apt-get remove --auto-remove openbox
+   - run: apt-get purge openbox
+   - run: apt-get remove xfce4-*
+   - run: apt autoremove
+   - run: systemctl set-default multi-user.target
+   - run: reboot now
+   - (should boot to login prompt, no desktop)
+ - run: shutdown now
+ - put uSD into RPi-4
+ - run: lsblk
+ - verify that sdb/sdb2 is the partition to play with
+ - run: sudo umount /dev/sdb2    
+ - run: sudo e2fsck -f /dev/sdb2
+ - run: sudo resize2fs /dev/sdb2
+ - (now have expanded file system memory to full size of partition)
+ - run: sudo dd if=/dev/sdb of=Images/radxa-bullseye-cli-031723.img 
+ - (now have full size image of the uSD... about 7.4 GB)
+ - run: xz -k Images/radxa-bullseye-cli-031723.img
+ - (now have xz version of the cli base image... about 560M)
+
+ - we can now publish the cli version to github as a cli base image
+
+ Build from CLI version base
+  - boot in target and login as root
+  - run: df -k			// verify that /dev/mmcblk1p2 showing about 32% use
+  - normal build process
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
