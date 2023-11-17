@@ -1,1 +1,4 @@
 insmod /usr/lib/modules/5.15.93-sunxi/kernel/drivers/net/wireless/rtl8812au/88XXau.ko.xz 
+
+lsmod		// list modules in use in Linux
+

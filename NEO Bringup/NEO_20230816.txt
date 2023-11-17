@@ -1,0 +1,18 @@
+NEO_20230816.img bringup
+
+
+0:00	power on
+1:42 	first reboot
+2:14 	login
+3:30  	reboot 2
+4:05 	login 2
+5:55 	ifconfig shows wlan1 flags 4163
+7:14 	OLED, Amber
+
+shutdown 10 sec
+
+reboot
+0:00 	power on
+0:34 	OLED
+1:13 	Amber
+
