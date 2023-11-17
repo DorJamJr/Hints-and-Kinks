@@ -48,3 +48,15 @@ Scoped signals and find:
   - run: reboot now
   - (no joy)  
 
+090123
+- Tried the RM3_20230827 code in the 1.7.2  board set. No USB
+- Burned fresh copy of RM3_20230809 code and tried in 1.7.2 board set... USB works
+- (Both are debian bullseye... not sure of the date of the source though)
+- Try this code image in the 1.8.5 hardware... no USB
+- Put 0809 image back into 1.7.2 hardware... still works
+- 0827 in 1.7.2 hardware ... works
+- 0824 in 1.7.2 hardware ... works
+
+Is there any other difference between the 1.7.2 hdwr and the 1.8.5 hardware except the "Bi" vs "B" versions of the USB2514??
+
+

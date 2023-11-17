@@ -1,2 +1,49 @@
 RM3_20230826
 
+New build starting from radxa-cm3-io-debian-bullseye-cli-arm64-20230317.img (which is a desktop free version of 
+   radxa-cm3-io-debian-bullseye-xfce4-arm64-20230317-0810-gpt.img)
+
+Error out:
+
+TASK [hat-service : Expand swapfile] ********************************************************************************
+fatal: [10.0.0.59]: FAILED! => {"changed": true, "cmd": ["fallocate", "-l", "400M", "/swapfile"], "delta": "0:00:00.286071", "end": "2023-08-26 17:32:21.598841", "msg": "non-zero return code", "rc": 1, "start": "2023-08-26 17:32:21.312770", "stderr": "fallocate: fallocate failed: No space left on device", "stderr_lines": ["fallocate: fallocate failed: No space left on device"], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [hat-service : show swap_result] *******************************************************************************
+ok: [10.0.0.59] => {
+    "msg": "output of expand swapfile is {'changed': True, 'stdout': '', 'stderr': 'fallocate: fallocate failed: No space left on device', 'rc': 1, 'cmd': ['fallocate', '-l', '400M', '/swapfile'], 'start': '2023-08-26 17:32:21.312770', 'end': '2023-08-26 17:32:21.598841', 'delta': '0:00:00.286071', 'failed': True, 'msg': 'non-zero return code', 'stdout_lines': [], 'stderr_lines': ['fallocate: fallocate failed: No space left on device']}"
+}
+
+TASK [hat-service : fill swapfile] **********************************************************************************
+An exception occurred during task execution. To see the full traceback, use -vvv. The error was: OSError: [Errno 28] No space left on device
+fatal: [10.0.0.59]: FAILED! => {"changed": false, "module_stderr": "Shared connection to 10.0.0.59 closed.
+", "module_stdout": "Traceback (most recent call last):
+  File \"/root/.ansible/tmp/ansible-tmp-1693071141.777348-48248-216151307962621/AnsiballZ_command.py\", line 107, in <module>
+    _ansiballz_main()
+  File \"/root/.ansible/tmp/ansible-tmp-1693071141.777348-48248-216151307962621/AnsiballZ_command.py\", line 95, in _ansiballz_main
+    modlib.write(base64.b64decode(ZIPDATA))
+OSError: [Errno 28] No space left on device
+", "msg": "MODULE FAILURE
+See stdout/stderr for the exact error", "rc": 1}
+...ignoring
+
+TASK [hat-service : change swap mode] *******************************************************************************
+An exception occurred during task execution. To see the full traceback, use -vvv. The error was: OSError: [Errno 28] No space left on device
+fatal: [10.0.0.59]: FAILED! => {"changed": false, "module_stderr": "Shared connection to 10.0.0.59 closed.
+", "module_stdout": "Traceback (most recent call last):
+  File \"/root/.ansible/tmp/ansible-tmp-1693071142.4066591-48256-88532248020344/AnsiballZ_file.py\", line 107, in <module>
+    _ansiballz_main()
+  File \"/root/.ansible/tmp/ansible-tmp-1693071142.4066591-48256-88532248020344/AnsiballZ_file.py\", line 95, in _ansiballz_main
+    modlib.write(base64.b64decode(ZIPDATA))
+OSError: [Errno 28] No space left on device
+", "msg": "MODULE FAILURE
+See stdout/stderr for the exact error", "rc": 1}
+
+RUNNING HANDLER [bootstrap : Install PxUSBm.py] *********************************************************************
+
+RUNNING HANDLER [bootstrap : Install urllib3] ***********************************************************************
+
+PLAY RECAP **********************************************************************************************************
+10.0.0.59                  : ok=121  changed=63   unreachable=0    failed=1    skipped=63   rescued=0    ignored=9   
+
+   
