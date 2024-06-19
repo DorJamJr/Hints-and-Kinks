@@ -1,0 +1,33 @@
+Scope 1013D  (FNIRSI_1013)
+
+From github.com/pecostm32/FNIRSI_1013D_Firmware
+
+- Download the zip (FNIRSI_1013D_Firmware-main.zip) to the RPi CM4 (/home/pi/FNIRSI_1013)
+- Unpack the zip in that directory
+- open terminal
+- insert a new uSD card into RPi4 USB slot
+- in terminal
+	cd /home/pi/FNIRSI_1013/FNIRSI_1013D_Firmware-main/fnirsi_1013d_scope/dist/Debug/GNU_ARM-Linux
+	lsblk		; showed sda1 and sda2
+	sudo umount /dev/sda1
+	sudo unount /dev/sda2
+	sudo dd if=fnirsi_1013d.bin of=/dev/sda bs=1024 seek=8
+	sudo dd if=standard_display_config_sector.bin of=/dev/sda bs=1024 seek=355
+remove uSD from RPi4 and insert into scope board
+power on
+
+For new uSD or previously used uSD:
+umount /dev/sda1
+sudo dd if=/dev/zero of=/dev/sda bs=1024 count=1          ; erases the sda1 partition
+gpated /dev/sda                                           ; starts gparted to build new partition
+
+in gparted:
+	Menu->Device->Create Partition Table
+	Menu->Partition->New                                  ; create new partition fat32, 1MB free preceeding
+	use check mark to write the change
+	quit gparted
+
+for original OS:
+	copy project from github.com/pecostm32/FNIRSI-1013D-1014D-Hack to /home/pi/FNIRSI_1013_Orig
+	cd /home/pi/FNIRSI_1013_Orig/FNIRSI_1013D-1014D-Hack-main/Original firmware backup
+	sudo dd if=fnirsi_1013d_fwb.bin of=/dev/sda bs=1024 seek=8

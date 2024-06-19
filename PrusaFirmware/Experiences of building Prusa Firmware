@@ -1,0 +1,216 @@
+Experiences of building Prusa Firmware
+
+BUILD:
+Install VirtualBox and then install Ubuntu 22 in VB
+Create user dorjamjr with pw pepsi4
+
+Create shared folder for /Users/Jim/Documents/GitHub/Prusa-Firmware and name it Prusa
+In VirtualBox, access to this folder is via folder name "sf_Prusa" (shared folder) and can be 
+  used within the Ubuntu environment by terminal folder /media/sf_Prusa
+Using Ubuntu (VirtualBox) and from within that folder we can run "sudo ./PF_build.sh" 
+  (pw = pepsi4) and choose varient 10 (MK3S) and option 2 (English only)
+Build output located in (Ubuntu environment) /media/PF-bulid-hex/FW3130-RC1-Build6853/BOARD_EINSY_1_0a.
+  Note that this is NOT directly available outside of the VirtualBox environment
+After a build, rename the created .hex and .elf to something simple (like 01_MK3S.hex and 01_MK3S.elf)
+Copy the .hex file to the /media/sf_Prusa/BUILDS directory (create it first) so that
+  the hex will be available to the Prusa slicer for upload to the printer
+In Prusa Slicer, go to Configuration -> Flash Printer Firmware and browse to:
+  /Users/Jim/Documents/GitHub/Prusa-Firmware/BUILDS. 
+Find the .hex file, select it and upload to the printer. 
+  (Note: make sure to disconnect Pronterface or the upload will fail.)
+
+
+
+
+Debug:
+Not getting through self check
+Trying to see debug statements
+Use Pronterface with serial connected shows output of:
+  	printf_P(PSTR("tmc2130_goto_step %d %d %d %d \n"), axis, step, dir, delay_us, microstep_resolution);
+Use this as a model for my own debug...
+Also:
+      SERIAL_PROTOCOLPGM("?JRA - At gcode_M45 (#3103).\n");
+Failing the M45 with "Calibration failed! Check the axes and run again."
+Try to find where in code this is occurring...
+Marlin_main.cpp
+  M45 entry point at #3103
+  Getting past
+
+Fails at #3221
+   Z_AXIS_POSITION is: 6.685, 6.922, 
+   MESH_HOME_Z_SEARCH is: 0
+   HOME_Z_SEARCH_THRESHOLD is: 5.0
+
+Create a Prusa bed look alike with fibreboard and aluminum tape with holes at "Calibration points"
+Now the Z_AXIS_POSITION comes in at 5.0 (consistent)
+
+So the search for bed cal points is to find the skew of the bed ... it does this by looking for blank spots
+ in the heating element of the heatbed. So this is a crucial part of the Prusa design and must be simulated accurately if we are to make it run like a real MK3S.
+
+ The center of the front left cal spot is 49.7 mm from the front of the Ender heat bed
+ Dimensions from that point to next cal: horizontal= 119.67+88.8 = 208.47   209
+                                         vertical  = 92.18+99.67 = 191.85   192
+
+ 11/21/23
+ Try to find the point where the code is failing the xy search (skew) numbers and paste in some valid results...
+ The fail is at # 3299 (else)
+ The "if" is at #3223... but this is just the cal of Z axis (which we have now got sorted... so wherre is the  skew routine fail?)
+
+ #3225 - #3243 - "if only Z"  (we are doing all)
+ #3253 doing circular search for hole
+ mesh_bed_calibration.cpp #2441 is where the successful result is found/stored
+
+ 		bed skew angles stored in a1, a2 (#336, #337)
+ 		0.12 skew is "mild"
+
+ 		BED_SKEW_OFFSET_DETECTION_PERFECT 			= 0,  //!< Perfect.
+		BED_SKEW_OFFSET_DETECTION_SKEW_MILD			= 1,  //!< Mildly skewed.
+		BED_SKEW_OFFSET_DETECTION_SKEW_EXTREME		= 2   //!< Extremely skewed.
+
+		Note:  NEW_XYZCAL is defined (enabled) for variant MK3s		
+
+		Note: find_bed_offset_and_skew() starts on #2194
+		Iteration loop begins at #2216
+
+		Constants for hole locations at #82 ff
+
+		Use Pronterface with command M45 to debug
+
+		Using rev 4 of the xy cal fixture with front edge set at 21.75 from front edge of heater plate, and using rev 12 of the hex OS (X0 = 37, X1 = 227, Y0 = 18.4, Y1 = 210.4) we seem to be calibrating
+
+		Failed....
+		Enlarge holes to 10mm (drill) and we get through point 1 
+
+		calculate_machine_skew_and_offset_LS() is where the skew is calulated
+
+11/24/23
+
+Using fixture XYZ_Cal-5 (hole locations X0=37, X1=227, Y0=18.4, Y1=190.4) with Prusa code v 13) I located the X0,Y0 hole at same location as on the MK3.9 bed, then run code M45
+Front edges offset 8.56... failed, can't find point #2... scan seems to be from front edge of circle to about 7.5mm past back edge... so change edge/edge position to 12.3mm and retry
+
+Search for X0,Y0 seems about right for Y margins... the X search seems to be about 3mm to the right... but we did get 71.2%,61.3% coorelation (whatever that means), X1,Y0 fails... 
+
+DBG(_n("Pattern center [%f %f], match %f%%\n"), max_c + 5.5f, max_r + 5.5f, max_match / 1.32f);
+   7.5, 24.5
+
+   edge/edge 10.76 (about center Y on search area)...  Failed X0,Y0
+
+   edge/edge 11.5   ALL 4 calibration points found, BUT the recheck of locations failed... x position seems to be 6 mm too far right (the 6 mm offset I think) so change the X0, X1 locations in code by -6 to 31 and 221 and build ver 14 of code
+
+   Change JRA_X0 and JRA_X1 to 31.f and 221.f
+   This seems to have run and updated the Support-> XYZ.cal details to:
+      Y distance from min:   Left: 10.34, Right: 10.30
+      Measured skeb: 0.61 degrees (severe skew 0.25, mild skew 0.12)
+      [0;0] point offset: X:0.09, Y:-0.16
+
+   So I THINK this means the test bed is working, but it is finding a large skew...
+
+   Adjusted the left rail to shorten by 0.6mm and try m45... failed X1,Y0 
+
+   Move mask forward a bit... try again... failed..,, repeat...
+   Bit by bit to e/e of 8.5... mostly fail X0,Y0
+
+   Try bit by bit moveing back...
+   @13.13 e/e we got all 4 points but they resulted in:
+      Y distance from min:   Left: 10.34, Right: 10.30
+      Measured skeb: 1.26 degrees (severe skew 0.25, mild skew 0.12)
+      [0;0] point offset: X:0.09, Y:-0.16
+
+      AARGH!
+
+      See: https://github.com/prusa3d/Prusa-Firmware/issues/147
+      mesh_bed_calibration.cpp #702
+      I have disabled skew correction (per above) in ver 16.... let's finish the printer and see if we can print... (The message about needing calibration is still on the opening screen... if everything else is ok, we can mod the code to prevent message popup)
+
+      
+ 112523
+ Attach Ender plate and mag sheet... Wire into Rambo
+ Attach latest cal mask to top of mag sheet with blue tape and run m45
+ That completes with skew 1.45 (at 150mm this computes to 3.6 mm rotation)
+ Rotate cal plate clockwise (1mm?) and re run to see if the 1.45 comes down 
+
+ Left e/e offset = 13.27, right e/e offset = 13.07 ... skew = 0.13 degrees (amazing!) but the Y offset (L and right) still showing the reset values ("nanmm")  and [0;0] point offset showing X and Y "nanmm"
+
+ Check move limits: X=210   (could go to 220); Y=195  (mayby go to 210); Z=195 (ok)
+
+On first layer cal, we hit Crash Detected on X... enable codes M910 - M918 and run "M916 X" which shows X value is 0,  Change to 1... but that seems to be more sensitive... 
+
+ver 20 of hex file... raise x running current from 16 to 22 and homing current from 8 to 12 (try to fix crash) MK3S.h #282
+   -- Better... got thru 9 points of cal on first layer calibration... then crashed on homing 
+   -- raise currents to 25 and 15 (v21 hex)
+   -- raise currents to 30 and 20 (v22 hex)
+   -- too much... some x stall (thermal shutdown x?)
+   -- 22 & 16 (ver 23 hex)
+
+112623
+Decided to change out the X motor. The one on C3 had a 33 mm deep frame, the MK3.9 has a 39 mm frame. Looking at my original printer (Kysan motors... supposedly pretty good motors) the X motor there has a 47mm frame. I THINK this gives more torque per ma, so hoping that will solve the "X crash" issues. While trading out the motor, I found that the pully on the C3 motor was loose! After trading motors (re-use the pully from C3... diameter is smaller) I ran first layer calibration successfully. Then took back the motor currents back to the originals (16 and 8) (ver 24) and again ran first layer cal... successfully. Note that Zoffset = -0.723mm for the successful prints.
+
+Going to try Calibration -> Wizard
+  - fails "Axis length   X" (measured axis length 244.210) ?? add debug statement and compile v 25
+  - default was set at 220, change to 242 and recompile v25
+  - OK to xyz cal... couldn't find #2... (e/e = 13.19)
+  - change to 12.19,11.81 (left.right) and retry xyz
+     - result: Fail: 0.70   e/e  12.32, 12.03
+     - e/e 12.29, 11.69... can't find #2
+     - e/e 12.91, 12.30 --- failed 1.84
+
+
+112723     
+Print large square (190mm) and stop after first traces down. From the pattern we find:
+  - front margin - back margin is 7.33 mm... need to move the Y plate BACK (so vertical frame FORWARD) by 7.33/2 = 3.15 mm = 2.1 turns
+  - the "square" is skewed (use 8.5x11 sheet) by 1.6mm over length of 190mm... to correct this, we need to bring the RIGHT side of the vertical plate BACKWARD by 1.43mm   (thread rod separation = 170mm so 170/190 x 1.6) ==> 1.43/1.5 Turns (.95 T)==> 5.72 faces
+- COMBINING:
+  Right side plate nuts need to move FORWARD by 3.15mm and then BACK by 1.43/2 (=.71mm) = 2.44mm = 1.62T = 1 Turn + 3.75 faces
+  Lefts side plate nuts need to move FORWARD by 3.15 mm and the FORWARD by 1.43/2 (=.71mm) = 3.86 mm = 2.57T = 2 T + 3.44 faces
+
+  Make adjustments and reprint the 190mm square...
+  - Y centering now OK
+  - still 0.55mm skew on 190mm run...bring RIGHT side nut FORWARD by 170/190*0.55mm = .49mm ... (.49/1.5)*6
+    = 0T + 2 faces
+  - (TMC OVERTEMP??)
+
+  Make adjustment and reprint again... Got it!
+
+
+  112823
+
+  With rail attached on right side and cal plate biased into rail and e/e (calPlate front aligned to rail front) we need to offset x cal -8, y cal -6, so try : X0=23, X1=213, Y0=12.4, Y1=184
+    WAS:
+    - #define JRA_X0 31.f  // was 37.f
+      #define JRA_X1 221.f  // was 227.f  // was 245.f
+      #define JRA_Y0 18.4f
+      #define JRA_Y1 190.4f // was 210.4f
+
+   The offsets to x and y based on auto home followed by finding x/y of first hole where nozzel is in the center... create ver 26, upload and try xyz cal...
+   
+
+112923     
+
+Find out where the success constants for xyz cal are stored  (M45 command I think (#3103 <- #5523 <- #3971))
+ #3971 - process_commands() contains case M45 which contains "case 45:" (#5523) which calls "gcode_M45()" at #3103
+
+ eeprom.cpp #62 store bed constants
+ Marlin_main.cpp - #3258 - find_bed_offset_and_skew(..) -> mesh_bed_calibration.cpp #2211
+ #2455 calculate machine skew()
+ #188  find_bed_offset_and_skew()   (see #380 where skew is computed)
+    at #383 angle diff is what is stored by eeprom_update_float()
+
+ "Y distance from min" - ultralcd.cpp #2446: count_xyz_details(distanceMin) (distanceMin[0] = Left, distanceMin[1] = Right)   but this gets a bit hairy reading an array of points and doing some calcs!
+
+ #2443  lcd_menu_xyz_y_min()  ->  "Left: Right:"
+ #2487  lcd_menu_xyz_skew()   ->  "Skew"
+ #2522  lcd_menu_xyz_offset() ->  "[0;0] point offset"
+
+ Marlin_main.cpp - #1547 - calibration needed message  - comment out
+                 - #1554 - live adjust warning... re-run live adjust -  fixed power on msg on Z-adj
+                 - #1557 - thermal model not yet set - run thermal model cal 
+
+
+
+
+
+
+
+
+
+
