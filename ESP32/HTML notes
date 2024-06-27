@@ -1,0 +1,59 @@
+Notes on lessons learned writing HTML for ESP32
+
+Color, font, background color... must be within a style="..." in the object declaration:
+	<button stylel="color:orange">Some Text</button>
+
+Comments in the html style area (between <style> and </style>) use 
+  /* comment */
+Comments in the html script area (between <script> and </script>) use
+  // comment
+Comments in the html elsewhere use
+  <!--  comment -->
+
+The text section of an html element is denoted by:
+  document.getElementById("elementName").innerHTML
+
+Declare an element name with, for example:
+  <button id=button1> ....  </button>
+
+Link to a function when an element (like button) is clicked with:
+  <button onclick="buttonClicked"> ... </button>
+Declare a function (so referenced) in the <script> section of the 
+  document like this:
+  <script>
+  	function buttonClicked(){
+  	  (your code in here)
+  	}
+  </script>
+  
+Typical full function responding to button click:
+function button5click() {						// declare the function
+    var xhttp = new XMLHttpRequest();			// set up handling server response to click
+    xhttp.onreadystatechange = function() {		// when server has responded
+      if (this.readyState == 4 && this.status == 200) {		// make sure response complete
+        document.getElementById("confirm").innerHTML =		// puts text in button named "confirm"
+          this.responseText;
+      }
+    };
+    xhttp.open("GET", "commit", true);		// create the request in response to the button click	
+    xhttp.send();							// this sends the request to the server
+  }
+
+
+STYLING:
+
+CSS styling between <style> and </style>
+
+A style beginning with a normal element (like "h1") applies to ALL <h1> </h1> sections
+
+A style beginning with a dot (like ".btn1") defines a new element class and applies when an element (like "div") includes it in the opening <> area with the keyword "class"... like <div class="btn1"> </dev>
+
+A style beginning with a dot can have a follow on standard element declaration (like ".btn button") and (seems to be) is interpreted as a new class which when applied like <div class="btn1"> applies the style to all the buttons in the specified <div> </div>
+
+You can have multiple delclarations of the new class applying to various elements in that class (so a style declaration for ".btn1 label" is allowed)
+
+To over ride style for an individual element, add 'style=" color:white"' to the individual element within the opening <element> declaration, like:  
+  <label style="background-color:cyan">My Label Text</label>
+
+Multiple style over-rides allowed, just separate them with ";", like:
+   <label style="background-color:cyan; font-size:30px">My Label Text</label>
