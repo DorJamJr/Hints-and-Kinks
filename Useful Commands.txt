@@ -97,6 +97,12 @@ systemctl enable ssh    // permenantly enable ssh
 
 Ctl-Alt-F1 switches to terminal (full screen)
 Ctl-Alt-F7 switches back to GUI screen
+su connectbox
+sudo -i
+// both of the above make you root
+// if root isn't setup do:
+sudo passwd root
+
 
 
 SEARCHING:
