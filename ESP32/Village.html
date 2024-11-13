@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- the style section contains modifications to what elements will look like... colors
+     font sizes, rounded corners, etc. We actually use the elements in the <body> section -->
+
+<!-- use /* */ to put COMMENTS in <style> section. -->
+
+<!-- style items that do not begin with a dot (".") modify standard elements (like "button");
+     style items that do begin with a dot create modifiers called class items and are used by adding 
+     a "class" attribute to the element you are using (see, for example, button with id=button1, below)-->       
+
+<style>
+	 /*-- a canvas on which to place your components of the webpage --*/  
+
+  .title{
+  	display: block; 
+    width: 500px;	/* causes centering of text */
+    color: black; margin: 0px auto 30px;
+    border: none;    
+    text-decoration: none;
+  }
+
+  .card {
+    display: block; 
+    width: 500px;
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 20px 50px;
+    text-decoration: none;
+    font-size: 25px;
+    margin: 0px auto 35px;
+    cursor: pointer;
+    border-radius: 10px;
+    box-shadow: 0px 2px 18px -4px rgba(0,0,0,0.75);
+  }
+
+  .card button{
+    font-size:20px;
+    padding: 10px 10px;
+    border-radius: 10px;
+  }
+  .card label {
+    padding: 40px 0px;
+    font-size:35px;
+  }
+
+ </style>
+
+
+<!-- the body section contains the elements actually shown on the page -->
+<body>
+
+<h1 class="title">ESP32 Village Control<h1>
+
+<div class="card">
+  	<label style="padding: 40px 60px 40px 0px;">Building selector:</label>  
+  	<button id=button1 onclick="button1click()">UP</button>
+  	<button id=button2 onclick="button2click()">DOWN</button>  
+  <br>
+  <p> </p>
+	  <label style="padding: 40px 60px 40px 0px;">Building selected:</label>
+	  <label id=bldg_id style="padding:40px 40px">0</label>
+  <br>
+  	<label>------------------------------------</label>
+  	<label style="padding: 40px 100px 0px 0px;">Scene selector:</label>
+  	<button id=button3 onclick="button3click()" >UP</button>
+  	<button id=button4 onclick="button4click()">DOWN</button>
+  <br>
+  <p> </p>
+  	<label style="padding: 40px 100px 40px 0px;">Scene selected:</label>
+ 	<label id=scene_id style="padding: 40px 40px;">0</label>
+  <br>
+	<label style="padding: 0px 40px 0px 0px; font-size: 20px">(current scene is displayed)</label>
+  <br>
+   <label>------------------------------------</label>
+  <p>
+	<button id=button5 onclick="button5click()" style = "background-color: orange; color:black;">COMMIT SCENE TO BUILDING</button>
+  <br>
+  <p></p>
+	<label id=confirm  style = "font-size: 20px; padding: 0px 0px; background-color:orange; color:black">---</label>
+</div>
+
+
+<!-- the script section contains the functions used in the page (javascript) -->
+<!-- use the "C" form for comments inside of <script> section -->
+
+<script>
+
+//<!-- these function called when buttons are pressed... it then creates the call to the
+//     server and handles the response by parsing the building # and the current scene #
+//     and filling in the values in the building # and scene # fields, respectively -->
+  function button1click() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("bldg_id").innerHTML =
+          this.responseText.split(",")[0];
+        document.getElementById("scene_id").innerHTML = this.responseText.split(",")[1];  
+        document.getElementById("confirm").innerHTML = " --- ";
+      }
+    };
+    xhttp.open("GET", "button1", true);
+    xhttp.send();
+  }
+
+  function button2click() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("bldg_id").innerHTML =
+          this.responseText.split(",")[0];
+        document.getElementById("scene_id").innerHTML = this.responseText.split(",")[1];  
+        document.getElementById("confirm").innerHTML = " --- ";
+      }
+    };
+    xhttp.open("GET", "button2", true);
+    xhttp.send();
+  }
+
+  function button3click() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("scene_id").innerHTML =
+          this.responseText;
+        document.getElementById("confirm").innerHTML = " --- ";
+      }
+    };
+    xhttp.open("GET", "button3", true);
+    xhttp.send();
+  }
+
+  function button4click() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("scene_id").innerHTML =
+          this.responseText;
+        document.getElementById("confirm").innerHTML = " --- ";
+      }
+    };
+    xhttp.open("GET", "button4", true);
+    xhttp.send();
+  }
+
+  function button5click() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("confirm").innerHTML =
+          this.responseText;
+      }
+    };
+    xhttp.open("GET", "commit", true);
+    xhttp.send();
+  }
+
+</script>
+
+</body>
+</html>
