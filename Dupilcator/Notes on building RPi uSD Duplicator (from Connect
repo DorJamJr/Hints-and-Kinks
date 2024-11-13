@@ -1,0 +1,42 @@
+Notes on building RPi uSD Duplicator (from Connectbox.technology.com)
+
+- Open Rpi website (https://www.raspberrypi.com/software/operating-systems/) and download RPi OS with desktop (bookworm: July 4, 2024)
+- Using BalenaEtcher, burn image to 8GB uSD ("target" uSD)
+- When burn to target uSD is complete, insert target uSD into RPi 3 unit and boot the RPI 3
+- Connect mouse and keyboard 
+- Go through standard RPi setup
+   - Set country, language, timezone
+   - Create username and password (jim, jim)
+   - Setup screen
+   - Choose wifi
+   - Enter wifi password
+   - Choose browser (Chromium)
+   - Select RPi Connect preference (disable)
+   - Select update software preference (skip)
+   - Restart
+- After reboot open a terminal window (top row of screen, rightmost icon... looks like small black screen with ">") 
+- At the top of terminal window, select Edit -> Preferences and choose "Custom" from the pallet list... then select a text color you like (light green)
+- In terminal window, type the following commands, waiting for completion after each command...
+   - wget https://raw.githubusercontent.com/GeoDirk/osid-python3/master/install_osid.sh  
+   - chmod 755 install_osid.sh
+   - sudo ./install_osid.sh
+      - (Note that this takes a while to run... be patient... mine took about 15 minutes)
+      -   jim note: "setting up firefox" spotted during this install
+   - When install is complete, you will see a message, "===Restart Your System===" above the command prompt
+   - sudo reboot now
+- After reboot, no icon...
+- Problem is that script expected the user name to be "pi" not "jim" so the desktop setup for the icon fails
+- The folder /etc/osid/system has the icon and the run_app.sh script
+- Open files icon (top of RPi desktop)
+  - browse to /etc/osid/system
+  - right click the icon named "rPi SD Card Duplicator" and choose "copy"
+  - browse to /home/jim/Desktop
+  - paste icon into /home/jim/Desktop folder
+  - in terminal window
+    - cd /home/jim/Desktop      
+    - chmod 755 osid.desktop.sample
+
+
+    Perhaps the best choice is now to rebuild using pi/pi as username/password; also, select firefox as the browser...
+
+    

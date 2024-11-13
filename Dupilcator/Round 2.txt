@@ -1,0 +1,75 @@
+Notes on building RPi uSD Duplicator (from Connectbox.technology.com)
+
+Round 1 failed to put icon on screen due to username NOT being "pi". Turns out the script expects the /home/pi directory
+ to exist and when not found, the icon is not placed on the desktop.
+ This round we will make user "pi", password "pi", select the Firefox browser and enable RPi Connect. [2:53 pm]
+
+- Open Rpi website (https://www.raspberrypi.com/software/operating-systems/) and download RPi OS with desktop (bookworm: July 4, 2024)
+- Using BalenaEtcher, burn image to 8GB uSD ("target" uSD)
+- When burn to target uSD is complete, insert target uSD into RPi 3 unit and boot the RPI 3
+- Connect mouse and keyboard 
+- Go through standard RPi setup
+   - Set country, language, timezone
+   - Create username and password (pi,pi)
+   - Setup screen
+   - Choose wifi
+   - Enter wifi password
+   - Choose browser (Chromium)
+   - Select RPi Connect preference (disable)
+   - Select update software preference (skip)
+   - Restart
+- After reboot open a terminal window (top row of screen, rightmost icon... looks like small black screen with ">") 
+- At the top of terminal window, select Edit -> Preferences and choose "Custom" from the pallet list... then select a text color you like (light green)
+- In terminal window, type the following commands, waiting for completion after each command...
+   - wget https://raw.githubusercontent.com/GeoDirk/osid-python3/master/install_osid.sh  
+   - chmod 755 install_osid.sh
+   - sudo ./install_osid.sh  [3:00 pm]
+      - (Note that this takes a while to run... be patient... mine took about 15 minutes)
+    - When install is complete, you will see a message, "===Restart Your System===" above the command prompt [3:28 pm]
+       (note:  at this oiubt the icon is on the screen)
+   - sudo reboot now
+
+
+- After reboot, we have two icons: Root File Manager and rPi SD Card Duplicator
+- Double click rPi SD Card Duplicator and we are asked how what to do with it... choose "Execute"
+   - error: "Site can't be reached"
+   - caused by the /etc/osid/system/server.py failing to start
+      - that caused by package cherrypy not being installed
+         - that caused by python packages being "Externally managed"
+         	- suggested work around:
+         	sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
+         	pip3 install cherrypy
+         	sudo touch /var/osid/access.log
+         	sudo chmod 666 /var/osid/access.log
+         	- This works ... now the icon properly launches the duplicator
+
+- To use duplicator..
+	- download an image (ends up in /home/pi/downloads)
+	- launch the Root File Manager (icon just above the rPi SD Card Duplicator icon)
+	- In the Root File Manager app, do the following:
+	   - browse to your downloaded image (typically .xz file)
+	   - drag the file to the tree IN THE MANAGER on the left side to /etc/osid/imgroot
+	   - wait for the copy to complete
+	   - STILL IN THE ROOT FILE MANAGER, 
+	      - right click on the image in /etc/osid/imgroot and choose Xarchiver option to unarchive the .xz to .img
+	   - WAIT... this takes a long time... led at bottom right of Root File Manager window will blink red and green
+	   -            	
+
+
+
+
+- Problem is that script expected the user name to be "pi" not "jim" so the desktop setup for the icon fails
+- The folder /etc/osid/system has the icon and the run_app.sh script
+- Open files icon (top of RPi desktop)
+  - browse to /etc/osid/system
+  - right click the icon named "rPi SD Card Duplicator" and choose "copy"
+  - browse to /home/jim/Desktop
+  - paste icon into /home/jim/Desktop folder
+  - in terminal window
+    - cd /home/jim/Desktop      
+    - chmod 755 osid.desktop.sample
+
+
+    Perhaps the best choice is now to rebuild using pi/pi as username/password; also, select firefox as the browser...
+
+
