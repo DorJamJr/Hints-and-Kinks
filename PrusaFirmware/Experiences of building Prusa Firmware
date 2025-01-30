@@ -4,22 +4,176 @@ BUILD:
 Install VirtualBox and then install Ubuntu 22 in VB
 Create user dorjamjr with pw pepsi4
 
-Create shared folder for /Users/Jim/Documents/GitHub/Prusa-Firmware and name it Prusa
+Download the desired source files and directory from 
+   https://github.com/prusa3d/Prusa-Firmware/releases  ("Source code (zip)")
+ and put it beneath the 
+ /Users/Jim/Documents/GitHub directory 
+ (like /Users/Jim/Documents/GitHubPrusa_FW_3.14.0)
+Under the new directory, create a new folder named "BUILDS"
+ (like /Users/Jim/Documents/GitHubPrusa_FW_3.14.0/BUILDS)
+
+In GitHub desktop, add the new release to the repository
+  - Click "Current Repository" (upper left)
+  - Click "Add" 
+  - Click "Create a new repository"
+  - Copy name of your added top level folder (like "GitHubPrusa_FW_3.14.0") and 
+     paste int "Name"
+  - Click "Create Repository"
+  - Warning says "directory not a repo... create instead?"
+  - Click "create a repository"
+  - Click "Publish" (to push up to DorJamJr... in the where dialog, 
+     choose other... default then to DorJamJr)
+
+
+
+THE CHANGES.....
+
+Mimic the following changes to make the new firmware release compatible with the 
+ Craig version of Prusa MK3.5...
+
+ ################ C H A N G E S   R E Q U I R E D  ######################
+
+112524
+Marlin_main.cpp
+  3.13.3                    3.14.0      
+  #1547-1550                 #1604-1607
+  Comment out:
+
+        else if (!calibration_status_get(CALIBRATION_STATUS_Z)) {
+          // wizard reset after service prep
+          lcd_show_fullscreen_message_and_wait_P(_T(MSG_FOLLOW_Z_CALIBRATION_FLOW));
+      } 
+
+  Only other changes are setting verbosity level and adding debug statements
+  (SERIAL_PROTOCOLPGM additions are print statements and are ignored for this edit)
+
+mesh_bed_calibration.cpp
+  #81-91                       insert #81-99
+   Replaces "const float bed_ref_points_4[] PROGMEM = {" array with the following:
+
+---------   start of replacement code --------------
+// JRA 112524
+// Define base locations for calibration points here for ease of modification
+#define JRA_X0 23.f     //was 31.f  // was 37.f
+#define JRA_X1 213.f    // was 221.f  // was 227.f  // was 245.f
+#define JRA_Y0 12.4f    // was 18.4f
+#define JRA_Y1 184.f    // was 190.4f // was 210.4f
+
+const float bed_ref_points_4[] PROGMEM = {
+  JRA_X0 - BED_PRINT_ZERO_REF_X - X_PROBE_OFFSET_FROM_EXTRUDER - SHEET_PRINT_ZERO_REF_X,
+  JRA_Y0 - BED_PRINT_ZERO_REF_Y - Y_PROBE_OFFSET_FROM_EXTRUDER - SHEET_PRINT_ZERO_REF_Y,
+
+  JRA_X1 - BED_PRINT_ZERO_REF_X - X_PROBE_OFFSET_FROM_EXTRUDER  - SHEET_PRINT_ZERO_REF_X,
+  JRA_Y0 - BED_PRINT_ZERO_REF_Y - Y_PROBE_OFFSET_FROM_EXTRUDER - SHEET_PRINT_ZERO_REF_Y,
+
+  JRA_X1 - BED_PRINT_ZERO_REF_X - X_PROBE_OFFSET_FROM_EXTRUDER  - SHEET_PRINT_ZERO_REF_X,
+  JRA_Y1 - BED_PRINT_ZERO_REF_Y - Y_PROBE_OFFSET_FROM_EXTRUDER - SHEET_PRINT_ZERO_REF_Y,
+
+  JRA_X0 - BED_PRINT_ZERO_REF_X - X_PROBE_OFFSET_FROM_EXTRUDER  - SHEET_PRINT_ZERO_REF_X,
+  JRA_Y1 - BED_PRINT_ZERO_REF_Y - Y_PROBE_OFFSET_FROM_EXTRUDER - SHEET_PRINT_ZERO_REF_Y
+};
+------  End of replacement code ---------
+
+  #704                      #705  insert #705-715 bypassing original function world2machine_update()
+  Insert the following at top of function "world2machine_update()" to use constants and bypass 
+   original functionality:
+
+--------  Start of insert code ----------
+    // JRA 112524
+    // BYPASS rotation/skew correction for non-prusa heat bed
+    world2machine_correction_mode = WORLD2MACHINE_CORRECTION_NONE;
+    world2machine_rotation_and_skew[0][0] = 1.f;
+    world2machine_rotation_and_skew[1][0] = 0.f;
+    world2machine_rotation_and_skew[0][1] = 0.f;
+    world2machine_rotation_and_skew[1][1] = 1.f;
+    return;
+
+    // JRA this code is never reached
+-------- End of insert code -------------    
+
+
+mesh_bed_calibration.h
+  #10-13                    #10-14
+//#define BED_Xn (206.f - BED_ZERO_REF_X) //205
+#define BED_Xn (201.f - BED_ZERO_REF_X) //205 - was 206.f JRA - Craig3 uses Ender heated so 5mm narrower
+
+
+ultralcd.cpp
+  no changes required (only difference is in informative print statements)
+
+variants/MK3S.h
+  #288                      #291-292    uncomment
+  uncomment:
+  #define TMC2130_SERVICE_CODES_M910_M918
+
+  #642                      #663-664    uncoment verbosity 
+  uncomment:
+  #define SUPPORT_VERBOSITY
+
+################
+
+
+THE BUILD.........
+
+In VB Ubuntu, click Settings (gear icon) -> Shared Folders and add your project folder
+ (like /Users/Jim/Documents/GitHub/Prusa_FW_3.14.0)
+Set a simple name for the folder (like "Prusa") in the Folder Name box 
+Click box Auto-mount, then OK, OK
+Restart VB (Ubuntu) and now the Ubuntu folders contains sf_Prusa 
+
 In VirtualBox, access to this folder is via folder name "sf_Prusa" (shared folder) and can be 
   used within the Ubuntu environment by terminal folder /media/sf_Prusa
-Using Ubuntu (VirtualBox) and from within that folder we can run "sudo ./PF_build.sh" 
-  (pw = pepsi4) and choose varient 10 (MK3S) and option 2 (English only)
-Build output located in (Ubuntu environment) /media/PF-bulid-hex/FW3130-RC1-Build6853/BOARD_EINSY_1_0a.
+
+(See article at: 
+  https://askubuntu.com/questions/466198/how-do-i-change-the-color-for-directories-with-ls-in-the-console
+ for some helpful color changes for the terminal)  
+
+ In Ubuntu, open a terminal window... (Bottom left... choose applications... choose Terminal)
+
+BUILD commands in the Ubuntu terminal:
+  cd /media/sf_Prusa
+  sudo ./PF-build.sh
+    (pw = pepsi4)
+    varient = 10 (MK3S)
+    option  = 2  (English only)
+    (The build starts and completes without further intervention)
+
+Build output located in the Ubuntu environment directory: /media/PF-bulid-hex
+ Note that the output files are two levels below this folder, the exact path determined by
+  the firmware title (ex: "FW 3140")... find the appropriate folder and drill down. In the 
+  specific case of FW3140, the path looks like:
+   /media/PF-build-hex/FW3140-Build8066/BOARD_EINSY_1_0a/
+  and the resultin files are:
+   FW3140-Build8066-MK3S-EN_FARM.elf
+   FW3140-Build8066-MK3S-EN_FARM.hex
   Note that this is NOT directly available outside of the VirtualBox environment
-After a build, rename the created .hex and .elf to something simple (like 01_MK3S.hex and 01_MK3S.elf)
+
+After a build, rename the created .hex and .elf to something simple (like 01_MK3S_3140.hex 
+ and 01_MK3S_3140.elf):
+    sudo FW3140-Build8066-MK3S-EN_FARM.elf 01_MK3A_3140.elf
+    sudo FW3140-Build8066-MK3S-EN_FARM.hex 01_MK3A_3140.hex
+
 Copy the .hex file to the /media/sf_Prusa/BUILDS directory (create it first) so that
   the hex will be available to the Prusa slicer for upload to the printer
 In Prusa Slicer, go to Configuration -> Flash Printer Firmware and browse to:
   /Users/Jim/Documents/GitHub/Prusa-Firmware/BUILDS. 
 Find the .hex file, select it and upload to the printer. 
   (Note: make sure to disconnect Pronterface or the upload will fail.)
+After loading new firmware, the printer will try to do a full calibration. Abort it! 
+ Then restart and choose to do the calibration manually. (Don't do any calibration though!)
+Go to Settings -> Live Z Adjust and set Z to -0.700
+Go to Calibration -> Auto home
+Go to Calibration and run First Layer Cal -> Continue (DO NOT do RESET)
+  Cal will start at -0.700
+    Make the number MORE NEGATIVE to move head DOWN
+(My new number after 3.14.0 install was -0.803)
 
 
+
+
+----------------------------------------------------------------------------------------
+---------- Below is the history of debug that resulted in the above recipe -------------
+----------------------------------------------------------------------------------------
 
 
 Debug:
@@ -205,6 +359,42 @@ Find out where the success constants for xyz cal are stored  (M45 command I thin
                  - #1554 - live adjust warning... re-run live adjust -  fixed power on msg on Z-adj
                  - #1557 - thermal model not yet set - run thermal model cal 
 
+112424
+There is a new version of firmware for the Prusa... 3.14.0
+Create a new github (local) folder: /Users/Jim/Documents/GitHub/Prusa_FW_3.14.0
+Open GitHub Desktop, repo = "Prusa-Firmware"
+  Looking at the History tab, select the "Changes to source for my MK3S clone"
+  At the bottom of the list are the Firmware folder changes listing the files I touched to make the 
+   MK3S clone (with non-Prusa heat bed) work. Changes are to files Firmware/:
+    - Marlin_main.cpp
+    - mesh_bed_calibration.cpp
+    - mesh_bed_calibration.h
+    - ultalcd.cpp
+    - variants/MK3S.h
+
+So to create a 3.14.0 version, we should be able to examine the changes to these files (using GitHub desktop, History) and mimic those same changes in the 3.14.0 code version.
+
+112524
+Marlin_main.cpp
+  3.13.3                    3.14.0      
+  #1547-1550                 #1604-1607
+  Only other changes are setting verbosity level and adding debug statements
+  (SERIAL_PROTOCOLPGM additions are print statements and are ignored for this edit)
+
+mesh_bed_calibration.cpp
+  #80                       insert #81-86
+  #81-91                    #88-99
+  #704                      #705  insert #705-715 bypassing original function world2machine_update()
+
+mesh_bed_calibration.h
+  #10-13                    #10-14
+
+ultralcd.cpp
+  no changes required (only difference is in informative print statements)
+
+variants/MK3S.h
+  #288                      #291-292    uncomment
+  #642                      #663-664    uncoment verbosity 
 
 
 
