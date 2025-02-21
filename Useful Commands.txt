@@ -121,6 +121,14 @@ systemctl restart hostapd
 systemctl restart dhcpcd
 
 
+LOGGING
 
+See cli.py #180ff
+
+Location:
+  logging.basicConfig(filename=log_file_name)
+  logging.basicConfig(level=logging.DEBUG)
+
+/var/log/syslog
 
 

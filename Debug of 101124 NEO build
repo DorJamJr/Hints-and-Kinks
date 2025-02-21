@@ -1,0 +1,354 @@
+Debug of 101124 NEO build
+
+021025
+
+Initially trying to find why we can't erase internal memory with the OLED admin screen. After loading the most recent (101124) build, I found the admin action to copy USB to uSD (internal memory) was failing. It would start the move routine, show the hourglass and then crash neo_battery_shutdown.
+
+ran
+	journalctl --follow --unit=neo-battery-shutdown
+and found that we crashed with
+	File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/neo_batterylevelshutdown/displays.py", line 349, in redrawCurrentPage
+		if self.pageStack == 'wait': showWaitPage(globals.a)
+		AttributeError: 'OLED' object has no attribute 'display'
+
+also:
+	File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/smbus2/smbus2.py", line 411, in write_i2c_block_data
+	ioctl(self.fd, I2C_SMBUS, msg)
+	TypeError: argument must be an int, or have a fileno() method.
+
+tracing:
+hats.py #549:  self.display.redrawCurrentPage()
+		(in AXP209 class... whose init contains:  self.display = displayClass(self))
+changing showWaitPage to self.showWaitPage gives
+   NameError: name 'showWaitPage' is not defined
+
+change:
+	showWaitPage(globals.a)
+to:
+	showWaitPage()
+doesn't crash... but maybe does hang...
+
+So the original:
+	if (self.pageStack == 'wait'): showWaitPage(globals.a)
+ 		NameError: name 'showWaitPage' is not defined
+
+And modifications:
+	if self.pageStack == 'wait': self.showWaitPage(globals.a)
+ 		NameError: name 'showWaitPage' is not defined
+
+ 	if self.pageStack == 'wait': showWaitPage()
+		NameError: name 'showWaitPage' is not defined
+
+	if self.pageStack == 'wait': self.showWaitPage()		// no crash but hangs...
+
+
+
+Now (???) we get hang of neo_battery_shutdown for:
+	if self.pageStack == 'wait': self.showWaitPage(globals.a)
+(so not crashing now... the function is deemed valid...)
+
+Looks like I can't get logging to work using journalctl... so let's open a virtual environment then run cli.py directly... then print statement show up...
+
+	cd /usr/local/connectbox/battery_tool_venv
+	source bin/activate
+	cd lib/python3.9/site-packages/neo_batterylevelshutdown
+	systemctl stop neo-battery-shutdown
+
+at this point we can edit our py files as needed and run:
+	python3 cli.py
+
+Running cli.py and accessing USB -> uSD
+	- screen on 1 sec, off .5 sec (?)
+	- clicking rt button, OK gives lockup... last message "at redrawCurrentPage()"	
+	- ctl-C breaks out 
+		- last trace back line before other libraries:
+
+ File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/neo_batterylevelshutdown/displays.py", line 168, in showWaitPage
+    self._curPage.draw_page()
+  File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/neo_batterylevelshutdown/page_display_image.py", line 61, in draw_page
+    self.device.display(out.convert(self.device.mode))
+
+displays.py
+    def showWaitPage(self,b=''):
+        global sequence
+        global sequence_time
+        global a
+
+        with self._curPageLock:
+            print("displays.py #159")
+            logging.debug("Showing wait page "+ str(globals.sequence) + " " +str(b) + "time: " + str(time.time() - globals.sequence_time))
+            if (time.time() - globals.sequence_time) >= 1.0:
+                print("displays.py #162")
+                globals.sequence = ((globals.sequence + 1.0) % 7)
+                globals.sequence_time = time.time()
+            print("displays.py #165")
+            self._curPage = page_display_image.PageDisplayImage(self.display_device,
+                                                                ('wait-' + str(int(globals.sequence)) + '.png'),b)
+            print("displays.py #168")
+            globals.a = b
+            print("displays.py #170")
+            self._curPage.draw_page()
+            print("displays.py #172")
+
+ 
+ button press to do transfer... then show wait page
+
+   we have a button press on channel 10
+just before check press time
+top of checkPressTime
+channel = 10    and otherChannel = 8
+    buttonTime = 0.25779056549072266dualTimeRecorded = 0
+after NEO re-establish interrupts
+displays.py #159
+displays.py #162
+displays.py #165
+displays.py #168
+displays.py #170
+page_display_image.py #61
+page_display_image.py #63
+displays.py #172
+displays.py #159
+displays.py #162
+displays.py #165
+displays.py #168
+displays.py #170
+page_display_image.py #61
+page_display_image.py #63
+displays.py #172
+displays.py #159
+displays.py #165
+displays.py #168
+displays.py #170
+page_display_image.py #61
+page_display_image.py #63
+displays.py #172
+at redrawCurrentPage() if self.pageStack
+   after wait, before call to showWaitPage(globals.a)
+
+
+
+displays.py
+    # Function to redraw the current page for use in
+    # refreshing the page during long display times
+    def redrawCurrentPage(self):
+        with self._curPageLock:
+            print("at redrawCurrentPage() if self.pageStack")
+            if self.pageStack == 'wait':
+                print("   after wait, before call to showWaitPage(globals.a)")
+                self.showWaitPage(globals.a)
+                print("   after wait, after call to showWaitPage(globals.a)")
+            else:
+                print("at redrawCurrentPage() at else")
+                self._curPage.draw_page()
+
+
+Normal (non- admin function) loop:
+	page_display_image.py    drawPage():
+		.
+		.
+		#61
+		self.device.display(out.convert(self.device.mode))
+		#63
+
+Admin action loop:
+		page_display_image.py drawPage()
+		.
+		.
+		#61
+		self.device.display(out.convert(self.device.mode))
+		#63
+	INTERRUPT TO:
+	displays.py		showWaitPage(self.b=''):
+		.
+		.
+		with self._curPageLock:		// stay in this loop until self._curPageLock == false (I think)
+			print("displays.py #159")
+		    logging.debug("Showing wait page "+ str(globals.sequence) + " " +str(b) + "time: " + str(time.time() - globals.sequence_time))
+            if (time.time() - globals.sequence_time) >= 1.0:
+                globals.sequence = ((globals.sequence + 1.0) % 7)
+                globals.sequence_time = time.time()
+            self._curPage = page_display_image.PageDisplayImage(self.display_device,
+                                                                ('wait-' + str(int(globals.sequence)) + '.png'),b)
+            globals.a = b
+            print("displays.py #170")
+            self._curPage.draw_page()		// see draw_page() above
+            print("displays.py #172")
+
+            								// after 3 loops finds curPageLock false and returns to
+            								// (where ever) and gets to redrawCurrentPage() and 
+            								//  prints
+            print("at redrawCurrentPage() if self.pageStack")
+            if self.pageStack == 'wait':
+                print("   after wait, before call to showWaitPage(globals.a)")
+                self.showWaitPage(globals.a)	// and gets stuck here!
+
+021325
+Restart (power cycle) the NEO as it was offline, (eth and wifi) and when using buttons the screen would cycle on/off (1 sec / .5sec)
+
+After restart I tried python3 cli and tried the admin copy USB -> uSD... OLED screen hang with hourglass at 45 degree (constant) and no screen text. The python display showed just one cycle (after button push) #159 -> #170, #61, #63, #172, "at redrawCurrentPage() if self.pageStack", "after wait, before call to showWaitPage(globals.a)". Then no more. 
+So I think that is a hang (no error messages).
+After button press we went to showWaitPage()  (displays.py #155), did the final drawPage(), went to redrawCurrentPage() (displays.py #347), and nothing after call to showWaitPage(globals.a)
+
+Did it get to showWaitPage()??
+
+	Yes... got to top with b="Checking Space" but did not enter the with self._curPageLock statement
+
+
+021425
+Changed the showWaitPage() (displays.py about #170) back to pre 10/11/24 code
+Ran and got following at button push...
+
+we have a button press on channel 10
+just before check press time
+top of checkPressTime
+channel = 10    and otherChannel = 8
+    buttonTime = 0.25109267234802246dualTimeRecorded = 0
+after NEO re-establish interrupts
+Traceback (most recent call last):
+  File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/neo_batterylevelshutdown/buttons.py", line 534, in handleButtonPress
+    self.chooseEnter(pageStack)
+  File "/usr/local/connectbox/battery_tool_venv/lib/python3.9/site-packages/neo_batterylevelshutdown/buttons.py", line 636, in chooseEnter
+    self.display.showWaitPage()
+TypeError: showWaitPage() missing 1 required positional argument: 'a'
+at redrawCurrentPage() if self.pageStack
+at redrawCurrentPage() at else
+page_display_image.py #61
+page_display_image.py #63
+lo        no wireless extensions.
+
+eth0      no wireless extensions.
+
+REASON... new showWaitPage gives default of "", old called with no passed parameter... fix... add default to our override... re-run
+
+so code now reads:
+
+def showWaitPage(self,a=''):
+        print("at top of showWaitPage   a=")
+        print(a)
+        print(" ")
+        print("  print of self._curPageLock:")
+        print(self._curPageLock)
+        with self._curPageLock:
+            print("displays.py in with loop")
+            self._curPage = page_display_image.PageDisplayImage(self.display_device,
+                                                                'wait.png',a)
+            print("displays.py in with, after self._curPage=")
+            self._curPage.draw_page()
+            print("displays.py in with, after self._curPage.draw_page()")
+        print("displays.py at end of showWaitPage")
+
+
+Change to RedrawCurrentPage() code since 101124 is making the old code the "else" case and adding a new "if" clause:
+(at desplays.py #347)
+
+    def redrawCurrentPage(self):
+        with self._curPageLock:
+            if (self.pageStack == 'wait'): showWaitPage(globals.a)
+            else: self._curPage.draw_page()
+
+This adds an extra showWaitPage... so where was showWaitPage being called before?
+
+Stuck for 1.5 hours... reboot... power cycle... OLED will show proper page for 4 secs or so then shows vertical hourclass with "Indexing Data"... This from system start of cli.py ???
+
+That uSD has some entry that is continually reverting to the hourglass graphic. 
+
+Going to try a new burn of uSD using the previous image
+(Tried... internet connection refused... repeatedly... also iwconfig showing SSID up, but not showing on iPhone...)
+
+021525
+Fresh uSD of 101124 image...
+
+SSID ok, enable admin tools... no internet IP... reboot
+Now IP ok 
+
+Change displays.py (#347 or so) to use just else case:
+    def redrawCurrentPage(self):
+        with self._curPageLock:
+ #           if (self.pageStack == 'wait'): showWaitPage(globals.a)
+ #           else: self._curPage.draw_page()
+            self._curPage.draw_page()
+
+change showWaitPage (added print statements only) to:
+
+    def showWaitPage(self,b=''):
+        global sequence
+        global sequence_time
+        global a
+
+        print("showWaitPage(self,b='')   -top-  displays.py #173")
+        print("b= ")
+        print(b)
+        print("self._curPageLock =")
+        print(self._curPageLock)
+        print("")
+        with self._curPageLock:
+            print("   showWaitPage inside of with")
+            logging.debug("Showing wait page "+ str(globals.sequence) + " " +str(b) + "time: " + str(time.time() - globals.sequence_time))
+            if (time.time() - globals.sequence_time) >= 1.0:
+                globals.sequence = ((globals.sequence + 1.0) % 7)
+                globals.sequence_time = time.time()
+            self._curPage = page_display_image.PageDisplayImage(self.display_device,
+                                                                ('wait-' + str(int(globals.sequence)) + '.png'),b)
+            globals.a = b
+            self._curPage.draw_page()
+        print("showWaitPage(self,b='')   -bottom-  ")
+        print("")
+
+
+Seems to work... buttons not funtioning after, but the admin pages  ended at "eject USB"...  
+
+
+screen capture:
+
+
+
+we have a button press on channel 10
+just before check press time
+top of checkPressTime
+channel = 10    and otherChannel = 8
+    buttonTime = 0.2228257656097412dualTimeRecorded = 0
+after NEO re-establish interrupts
+showWaitPage(self,b='')   -top-  displays.py #173
+b= 
+
+self._curPageLock =
+<unlocked _thread.lock object at 0xb5e0f800>
+
+   showWaitPage inside of with
+showWaitPage(self,b='')   -bottom-  
+
+showWaitPage(self,b='')   -top-  displays.py #173
+b= 
+Checking Space
+self._curPageLock =
+<unlocked _thread.lock object at 0xb5e0f800>
+
+   showWaitPage inside of with
+ redrawCurrentPage()    displays.py #347
+showWaitPage(self,b='')   -bottom-  
+
+lo        no wireless extensions.
+
+eth0      no wireless extensions.
+
+showWaitPage(self,b='')   -top-  displays.py #173
+b= 
+Copying Files
+Size:13196MB
+self._curPageLock =
+<unlocked _thread.lock object at 0xb5e0f800>
+
+   showWaitPage inside of with
+showWaitPage(self,b='')   -bottom-  
+
+ redrawCurrentPage()    displays.py #347
+lo        no wireless extensions.
+
+eth0      no wireless extensions.
+
+ redrawCurrentPage()    displays.py #347
+lo        no wireless extensions.
+
+eth0      no wireless extensions.
+
+
